@@ -8,6 +8,7 @@ typedef struct _Data {
     char *string2;
 } Data;
 
+
 typedef struct _HashEntry {
     struct Data *data; // User-defined data structure for use in the hash table
     struct _HashEntry *next_node; 
