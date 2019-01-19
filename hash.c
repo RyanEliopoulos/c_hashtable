@@ -3,7 +3,7 @@
 
 
 
-HashTable *newTable(int (*tableCompareFnx)(HashEntry*, HashEntry*)) {
+HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
 
     HashTable *new_table= malloc(sizeof(HashTable));
     
@@ -12,7 +12,7 @@ HashTable *newTable(int (*tableCompareFnx)(HashEntry*, HashEntry*)) {
     new_table->unique_entries = 0;
     new_table->highest_collision_count = 0;
     new_table->total_collisions = 0;
-    new_table->tableCompareFnx = tableCompareFnx; 
+    new_table->entryCompareFnx = entryCmpr; 
 
     return new_table; 
 }
