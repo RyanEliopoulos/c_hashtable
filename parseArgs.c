@@ -5,7 +5,7 @@ int parseArgs(int argc, char *argv[]) {
 
     /* Checking for insufficient command-line arguments */
     if (argc == 1) {
-        printf("Need to include at least one file path\n");
+        fprintf(stderr, "Need to include at least one file path\n");
         exit(100);
     }
 
@@ -17,11 +17,11 @@ int parseArgs(int argc, char *argv[]) {
         sscanf(argv[1], "%c %d", &dash, &count);
 
         if (count <= 0) { 
-            printf("Invalid input. Must be formatted: <-count> filepath1 <filepath2> <filepath3> .. where count is > 0\n");
+            fprintf(stderr, "Invalid input. Must be formatted: <-count> filepath1 <filepath2> <filepath3> .. where count is > 0\n");
             exit(101);
         }
         if (argc == 2) { // If Valid <count> but no file paths 
-            printf("Must include at least one filepath\n");
+            fprintf(stderr, "Must include at least one filepath\n");
             exit(102);
         }
     }
@@ -36,7 +36,7 @@ int parseArgs(int argc, char *argv[]) {
         stat_ret = stat(argv[i], &statbuf); // 0 upon success 
 
         if (stat_ret || !S_ISREG(statbuf.st_mode)) {
-            printf("\"%s\" is not a valid file path\n", argv[i]);
+            fprintf(stderr, "\"%s\" is not a valid file path\n", argv[i]);
             exit(103);
         }
     }
