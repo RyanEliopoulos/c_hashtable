@@ -1,5 +1,4 @@
 #include"hash.h"
-#include"crc64.h"
 
 HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
 

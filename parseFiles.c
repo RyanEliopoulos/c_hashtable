@@ -27,12 +27,12 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
         }
     }
 
-    if (word1 == NULL) {
+    if (word2 == NULL) {
         fprintf(stderr, "Files must include words to analyze\n");
         exit(201);
     } 
 
-    if (word2 == NULL) {
+    if (word1 == NULL) {
         fprintf(stderr, "Only one word found (and so no pairs)\n");
     }
    

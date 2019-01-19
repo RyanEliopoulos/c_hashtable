@@ -1,4 +1,5 @@
 #include<stdlib.h>
+#include"crc64.h"
 
 #define INITIAL_TABLE_SIZE 227 // The 50th prime number. definitely not large enough.
 
