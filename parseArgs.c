@@ -1,6 +1,8 @@
 #include"parseArgs.h"
 
 
+/* Ensures the arguments passed at the command line make sense. */
+/* <count> must be positive. Filepaths are checked for validity. */
 int parseArgs(int argc, char *argv[]) {
 
     /* Checking for insufficient command-line arguments */
