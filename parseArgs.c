@@ -36,7 +36,7 @@ int parseArgs(int argc, char *argv[]) {
         stat_ret = stat(argv[i], &statbuf); // 0 upon success 
 
         if (stat_ret || !S_ISREG(statbuf.st_mode)) {
-            fprintf(stderr, "\"%s\" is not a valid file path\n", argv[i]);
+            fprintf(stderr, "\"%s\" is not a valid file path\nBe sure to prefix the coutn with a dash\n", argv[i]);
             exit(103);
         }
     }
