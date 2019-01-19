@@ -59,3 +59,11 @@ int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
 
     return 1;
 }
+
+void printPairs_DEBUG(char *word1, char *word2) {
+
+    printf("word1: <%s>\n", word1);
+    printf("word2: <%s>\n\n", word2);
+
+}
+
