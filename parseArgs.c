@@ -9,18 +9,18 @@ int parseArgs(int argc, char *argv[]) {
         exit(100);
     }
 
-    int count = -1; // If -1 persists, no user-specified <count> value
-   
     /* Checking for user-supplied <count> value. */ 
+    int count = -1; // If -1 persists, no user-specified <count> value
+
     if (argv[1][0] == '-') { 
-        char dash; /* Only used to satisfy sscanf */
+        char dash; // Only used to satisfy sscanf 
         sscanf(argv[1], "%c %d", &dash, &count);
-        if (count <= 0) {
+
+        if (count <= 0) { 
             printf("Invalid input. Must be formatted: <-count> filepath1 <filepath2> <filepath3> .. where count is > 0\n");
             exit(101);
         }
-        
-        if (argc == 2) { /* Valid <count> but no file paths */
+        if (argc == 2) { // If Valid <count> but no file paths 
             printf("Must include at least one filepath\n");
             exit(102);
         }
@@ -33,7 +33,7 @@ int parseArgs(int argc, char *argv[]) {
 
     int stat_ret;  // Will help evaluate stat() call
     for ( i ; i < argc ; i++ ) {
-        stat_ret = stat(argv[i], &statbuf); /* 0 upon success */
+        stat_ret = stat(argv[i], &statbuf); // 0 upon success 
 
         if (stat_ret || !S_ISREG(statbuf.st_mode)) {
             printf("\"%s\" is not a valid file path\n", argv[i]);
