@@ -39,5 +39,8 @@ HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData);
 //HashTable *newTable();
 void addEntry(HashTable *, Data *);
 HashEntry *newTableEntry(Data*);
+HashEntry **unpackTableEntries(HashTable *);
 void freeTable(HashTable *);
 void freeHashEntry(fnxFreeData, HashEntry *);
+
+void debug_traverseTable(HashTable *);

@@ -27,7 +27,7 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
     new_table->table_directory = malloc(sizeof(HashEntry *) * table_size);
 
     for (int i = 0; i < table_size; i++) {
-        new_table->table_directory[i] == NULL;
+        new_table->table_directory[i] = NULL;
     }
     return new_table; 
 }
@@ -38,17 +38,19 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 void addEntry(HashTable *hash_table, Data *data_entry) {
 
     unsigned long long int hash = crc64(data_entry->hash_field) % hash_table->table_size; // Calculating hash value
-    printf("successfully hashed\n");    
+    //printf("successfully hashed\n");    
     HashEntry *new_entry = newTableEntry(data_entry); // Creating an entry node for the hash table
    
     /* Placing the new_entry into the bucket */ 
     if (hash_table->table_directory[hash] == NULL) { // Bucket is empty, assign and return
         hash_table->table_directory[hash] = new_entry;
-        printf("added new entry to table\n");
-        printf("Now debugging freeEntry(). SO undoing that\n");
-        hash_table->table_directory[hash] = NULL;
+        //printf("added new entry to table\n");
         hash_table->total_entries++;
-        freeHashEntry(hash_table->freeDataFnx, new_entry);
+
+        // DEBEUG STUFF. Just immediately removes the entry. Prevents chaining
+        //printf("Now debugging freeEntry(). SO undoing that\n");
+        //hash_table->table_directory[hash] = NULL;
+        //freeHashEntry(hash_table->freeDataFnx, new_entry);
         return;
     } 
 
@@ -101,22 +103,29 @@ HashEntry *newTableEntry(Data *data_entry) {
 
 /* Puts all hash entries into a HashEntry array */
 /* Useful for re-hashing a table and qsort() */
+
+/* link traversing may still be broken. We are missing one entry free and its the chained value */
+/* LOSING THE CHAIN IN HERE SOMEHOW! */
 HashEntry **unpackTableEntries(HashTable *hash_table) {
- 
-    HashEntry *unpacked_array[hash_table->table_size]; 
+
+    /* Initialize pointers for an 'array' of HashEntry pointers */ 
+    HashEntry **unpacked_array = malloc( hash_table->table_size * sizeof(HashEntry *) );
+    for (int i = 0; i < hash_table->table_size; i++) {
+        *(unpacked_array + i) = NULL;
+    } 
     int j = 0; /* next free slot in entry_array */
 
     /* check each bucket for entries */ 
     for (int i = 0; i < hash_table->table_size; i++) {
-        HashEntry *list_head = hash_table->table_directory[i];
+        /* de-refence the hash table directory */
+        HashEntry *list_head = hash_table->table_directory[i];//(*hash_table->table_directory + i);
+    
+        /* This while loop is whats causing the segfaults */
         while (list_head != NULL) {
-            HashEntry *next_node = list_head->next_node;
-            list_head->next_node = NULL;
             unpacked_array[j++] = list_head;
-            list_head = next_node;
+            list_head = list_head->next_node;
         }        
     }
-
     return unpacked_array;
 }
 
@@ -124,4 +133,23 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
     freeData(hash_entry->data);
     free(hash_entry);
+}
+
+// Also need to add logic to traverse a list, if one is encountered
+// This has confirmed all word pairs are put into the table.
+void debug_traverseTable(HashTable *hash_table) {
+    
+    HashEntry **directory = hash_table->table_directory; 
+    for (int i = 0; i < hash_table->table_size; i++) {
+        HashEntry *entry = *(directory + i);
+        HashEntry *temp; // DEBUG - attempt to free all table elements
+        while ( entry != NULL) {
+            char *string1 = entry->data->string1;
+            char *string2 = entry->data->string2;
+            printf("<%s>, <%s>\n", string1, string2);
+            temp = entry;  // DEBUG - used for attempt to free whole table
+            entry = entry->next_node;
+            freeHashEntry(hash_table->freeDataFnx, temp); // DEBUG - attempting to free al ltable values
+        }
+    } 
 }

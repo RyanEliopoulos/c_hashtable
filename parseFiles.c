@@ -60,7 +60,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 /* Packages the words into a new Data struct and inserts into the hash table via PLACEHOLDER() */
 void processPair(HashTable *hash_table, char *word1, char *word2) {
 
-    printf("allocating space for strings in new Data object\n");
+    //printf("allocating space for strings in new Data object\n");
     Data *new_data = malloc(sizeof(Data)); 
     new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
     new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
@@ -70,7 +70,7 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     assert(new_data->string2 != NULL);
     
 
-    printf("copying word pair into the structure\n");
+    //printf("copying word pair into the structure\n");
     /* load words into the structure */
     strcpy(new_data->string1, word1);
     strcpy(new_data->string2, word2);
@@ -83,12 +83,12 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     
     printf("Adding <%s> to the hash table\n", new_data->hash_field);
     // DEBUGGING so turning the hash table off
-    //addEntry(hash_table, new_data);  // Testing now
-    freeData(new_data);
+    addEntry(hash_table, new_data);  // Testing now
+    //freeData(new_data);
 
     // DEBUGGING STUFF HERE
     //debug_array[debug_counter++] = new_data;
-    printf("highest collisions:%u\n", hash_table->highest_collision_count);
+   // printf("highest collisions:%u\n", hash_table->highest_collision_count);
 }
 
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
