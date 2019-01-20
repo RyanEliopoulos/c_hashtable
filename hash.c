@@ -4,12 +4,10 @@
 /* Will also want a function that unpacks all of the Data pointers into an array so that the table controller  */
 /* can can free the relevant Data fields. This unpacking function will free the HashEntry nodes */
 #include<stdio.h>
-
 #include"hash.h"
 
 /* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
 /* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
-//HashTable *newTable(unsigned long long int table_size, int (*entryCmpr)(HashEntry*, HashEntry*)) {
 HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr, fnxFreeData freeDataFnx){
 
     HashTable *new_table= malloc(sizeof(HashTable));
@@ -101,11 +99,28 @@ HashEntry *newTableEntry(Data *data_entry) {
     return new_entry;
 }
 
-void freeTable(HashTable *hash_table) {
+/* Puts all hash entries into a HashEntry array */
+/* Useful for re-hashing a table and qsort() */
+HashEntry **unpackTableEntries(HashTable *hash_table) {
+ 
+    HashEntry *unpacked_array[hash_table->table_size]; 
+    int j = 0; /* next free slot in entry_array */
 
+    /* check each bucket for entries */ 
+    for (int i = 0; i < hash_table->table_size; i++) {
+        HashEntry *list_head = hash_table->table_directory[i];
+        while (list_head != NULL) {
+            HashEntry *next_node = list_head->next_node;
+            list_head->next_node = NULL;
+            unpacked_array[j++] = list_head;
+            list_head = next_node;
+        }        
+    }
 
+    return unpacked_array;
 }
 
+/* unallocates a HashEntry object and all of its children data structures */
 void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
     freeData(hash_entry->data);
     free(hash_entry);
