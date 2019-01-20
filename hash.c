@@ -111,7 +111,8 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
     /* Initialize pointers for an 'array' of HashEntry pointers */ 
     HashEntry **unpacked_array = malloc( hash_table->table_size * sizeof(HashEntry *) );
     for (int i = 0; i < hash_table->table_size; i++) {
-        *(unpacked_array + i) = NULL;
+        //*(unpacked_array + i) = NULL;
+        unpacked_array[i] = NULL;
     } 
     int j = 0; /* next free slot in entry_array */
 

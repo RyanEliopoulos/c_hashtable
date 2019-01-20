@@ -26,9 +26,9 @@ void main(int argc, char* argv[]) {
     HashEntry **unpacked_entry_array = unpackTableEntries(hash_table);
         
     for (int i = 0; i < hash_table->table_size; i++) {
-        if (hash_table->table_directory[i] != NULL) {
-            printf("<%s>\n", hash_table->table_directory[i]->data->hash_field);
-            freeHashEntry(hash_table->freeDataFnx, hash_table->table_directory[i]);
+        if (unpacked_entry_array[i] != NULL) {
+            printf("<%s>\n", unpacked_entry_array[i]->data->hash_field);
+            freeHashEntry(hash_table->freeDataFnx, unpacked_entry_array[i]);
         }
     }    
 
