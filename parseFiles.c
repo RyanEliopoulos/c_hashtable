@@ -1,6 +1,5 @@
 /* Trying to get the hash_field into _Data.  */
 
-
 #include"parseFiles.h"
 #include"getWord.h"
 #include<string.h>
@@ -48,20 +47,24 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
 
     Data *new_data = malloc(sizeof(Data)); 
     assert(new_data != NULL);
-    
-    
+
+    new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
+    new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
+
     /* load words into the structure */
     strcpy(new_data->string1, word1);
     strcpy(new_data->string2, word2);
     //new_data->string1 = word1; // Does this actually have the strings persist? I don't think so..
     //new_data->string2 = word2;   
-
+    
+    printf("copy ok?\n");
     /* build string used for hashing */
-    char *hash_field  = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(*hash_field) );
+    char *hash_field  = malloc(100); // Malloc could have been fine :(
+    printf("Does this malloc fuck us?\n");
     strcpy(hash_field, word1);   
     strcat(hash_field, word2); 
     new_data->hash_field = hash_field;    
-    
+    printf("data with <%s> is ready to be inserted\n", new_data->hash_field); 
     //addEntry(hash_table, new_data); Have not begun testing at this point yet.
 }
 
