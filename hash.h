@@ -26,10 +26,11 @@ typedef struct _HashTable {
     unsigned int highest_collision_count; // Collision count of bucket with most collisions 
     unsigned long long int table_size; // Tracks the table size. Used in the mod part of the hash process
     int (*entryCompareFnx)(HashEntry*, HashEntry*); // Function used to compare the values of the hash table
-    HashEntry *table_directory[]; 
+    HashEntry **table_directory; 
 } HashTable;
 
 
 
 HashTable *newTable();
+void addEntry(HashTable *, Data *);
 HashEntry *newTableEntry(Data*);
