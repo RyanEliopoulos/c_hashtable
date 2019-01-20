@@ -29,21 +29,24 @@ HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
 
 
 /* Handles inserting new Data into the hash table. */
+/* Need to add: state tracking */
 void addEntry(HashTable *hash_table, Data *data_entry) {
 
     unsigned long long int hash = crc64(data_entry->hash_field) % hash_table->table_size; // Calculating hash value
     printf("successfully hashed\n");    
     HashEntry *new_entry = newTableEntry(data_entry); // Creating an entry node for the hash table
-
+   
+    /* Placing the new_entry into the bucket */ 
     if (hash_table->table_directory[hash] == NULL) { // Bucket is empty, assign and return
         hash_table->table_directory[hash] = new_entry;
         printf("added new entry to table\n");
         return;
     } 
-    printf("Bucket isn't empty..finding place in list..\n");
+
     /* Bucket is not empty */
     /* Will iterate through bucket list, incrementing a matching entry or adding the new unique entry to the end. */
     HashEntry *temp_entry =  hash_table->table_directory[hash];
+    unsigned long int bucket_collisions = 1;
     printf("About to enter the list traversal while loop\n");
     while ( temp_entry->next_node != NULL ) {
 
@@ -54,6 +57,7 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
             return;
         }
         temp_entry = temp_entry->next_node; 
+        bucket_collisions++;
     }
     printf("make it to \"Checking last values\"\n");   
     /* Checking the last value in the list */
@@ -61,7 +65,14 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
         temp_entry->occurrences++;
     }
     else {
-       temp_entry->next_node = new_entry; // new_entry is unique to the hash table
+        temp_entry->next_node = new_entry; // new_entry is unique to the hash table
+        bucket_collisions++; 
+        if (bucket_collisions > hash_table->highest_collision_count) {
+            hash_table->highest_collision_count = bucket_collisions;
+        }
+        if (hash_table->highest_collision_count >= COLLISION_LIMIT ) {
+            // growTable(HashTable *hash_table);
+        }
     }
 }
 
