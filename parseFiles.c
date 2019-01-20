@@ -17,7 +17,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
-    HashTable *hash_table = newTable(&entryCompareFunction);
+    HashTable *hash_table = newTable(&entryCompareFunction, &freeData);
     char *word1 = NULL;
     char *word2 = NULL;
     char *temp;
@@ -32,7 +32,6 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
             word2 = temp;
             
             if (word1 != NULL && word2 != NULL) {
-                //printPairs_DEBUG(word1, word2);
                 processPair(hash_table, word1, word2); // Packages words into struct _Data and ships it off to a hash table.
             }
         }
@@ -85,6 +84,7 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
 
     // DEBUGGING STUFF HERE
     debug_array[debug_counter++] = new_data;
+    printf("highest collisions:%u\n", hash_table->highest_collision_count);
 }
 
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
@@ -100,13 +100,15 @@ int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
     return 1;
 }
 
+/* unallocate memory for a Data object and all its malloc'd structures */
+void freeData(Data *data) {
+    free(data->string1);
+    free(data->string2);
+    free(data->hash_field);
+    free(data);
+}
+
 void debug_init() {
     for (int i = 0; i < 1000; i++) debug_array[i] = NULL;
-}
-void printPairs_DEBUG(char *word1, char *word2) {
-
-    printf("word1: <%s>\n", word1);
-    printf("word2: <%s>\n\n", word2);
-
 }
 
