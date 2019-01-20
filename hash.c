@@ -1,5 +1,13 @@
+/* Going to want a hash function that unpacks all HashEntry nodes into a linear array. */
+
+/* Will then use this array in qsort(). */
+/* Will also want a function that unpacks all of the Data pointers into an array so that the table controller  */
+/* can can free the relevant Data fields. This unpacking function will free the HashEntry nodes */
+
 #include"hash.h"
 
+/* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
+/* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
 HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
 
     HashTable *new_table= malloc(sizeof(HashTable));
@@ -20,6 +28,7 @@ HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
 }
 
 
+/* Handles inserting new Data into the hash table. */
 void addEntry(HashTable *hash_table, Data *data_entry) {
 
     unsigned long long int hash = crc64(data_entry->hash_field) % hash_table->table_size; // Calculating hash value
@@ -54,7 +63,7 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
     }
 }
 
-/* Helper function for addEntry. Converts a Data struct into a HashEntry struct */
+/* Helper function for addEntry. Creates a HashEntry object out of a Data object */
 HashEntry *newTableEntry(Data *data_entry) {    
 
     /* Create and initialize new HashEntry */ 
@@ -65,3 +74,5 @@ HashEntry *newTableEntry(Data *data_entry) {
 
     return new_entry;
 }
+
+

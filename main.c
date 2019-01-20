@@ -1,4 +1,3 @@
-
 /* Remember to assert after every malloc */
 /* Probably should go through the code and change ints to unsigned long, etc. in certain places. Don't want overflow */
 
