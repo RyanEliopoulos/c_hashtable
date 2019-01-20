@@ -8,8 +8,8 @@
 
 /* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
 /* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
-HashTable *newTable(unsigned long long int table_size, 
-                        int (*entryCmpr)(HashEntry*, HashEntry*), void (*freeDataFnx)(Data *)) {
+//HashTable *newTable(unsigned long long int table_size, int (*entryCmpr)(HashEntry*, HashEntry*)) {
+HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr, fnxFreeData freeDataFnx){
 
     HashTable *new_table= malloc(sizeof(HashTable));
     
