@@ -1,4 +1,5 @@
 #include<assert.h>
+#include<string.h>
 #include"getWord.h"
 #include"hash.h"
 
