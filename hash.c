@@ -66,7 +66,6 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
     }
     else {
         temp_entry->next_node = new_entry; // new_entry is unique to the hash table
-        bucket_collisions++; 
         if (bucket_collisions > hash_table->highest_collision_count) {
             hash_table->highest_collision_count = bucket_collisions;
         }
