@@ -1,8 +1,6 @@
 /* Trying to get the hash_field into _Data.  */
 
-#include<string.h>
 #include"parseFiles.h"
-#include"getWord.h"
 
 // Debug stuff
 Data *debug_array[1000];
@@ -12,7 +10,7 @@ int debug_counter = 0;
 HashTable *parseFiles(int count, int argc, char *argv[]) {
 
     // DEBUG STATEMENT!
-    debug_init(); 
+    //debug_init(); 
     // END DEBUG STATEMENT
 
     int i = (count == -1) ? 1: 2;  // *filepath[] index
@@ -20,52 +18,57 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
     HashTable *hash_table = newTable(INITIAL_TABLE_SIZE, &entryCompareFunction, &freeData);
     char *word1 = NULL;
     char *word2 = NULL;
-    char *temp;
+    char *temp = "x";
 
     /* Processing files */
+    int j = 0; // Facilitates fix: 'getNextWord' character array leak
     for ( i; i < argc; i++ ) {
         FILE* current_file = fopen(argv[i], "r");
         assert(current_file != NULL);        
-        
         while ((temp = getNextWord(current_file)) != NULL) {
             word1 = word2;
             word2 = temp;
-            
+            j++; // Facilitate fix of 'getNextWord' mem leak
             if (word1 != NULL && word2 != NULL) {
                 processPair(hash_table, word1, word2); // Packages words into struct _Data and ships it off to a hash table.
             }
+            if ( word1 != NULL) {
+                free(word1);
+                word1 == NULL;
+            }
         }
+        if ( word2 != NULL) {
+            free(word2);
+            word2 = NULL;
+        }
+        fclose(current_file); 
     }
 
-    if (word2 == NULL) {
+    if ( j == 0 ) {
         fprintf(stderr, "Files must include words to analyze\n");
         exit(201);
     } 
 
-    if (word1 == NULL) {
+    if ( j == 1) {
         fprintf(stderr, "Only one word found (and so no pairs)\n");
     }
   
-    // return hash_table; 
-
-    // DEBUGGING STUFF HERE
-    for (int i = 0; i < 1000; i++) {
-        Data *temp = debug_array[i];
-        if (temp == NULL) break;
-        printf("Word1: <%s>, word2: <%s>, hash_field: <%s>\n", temp->string1, temp->string2, temp->hash_field); 
-    } 
+    return hash_table;
 }
 
 
 /* Packages the words into a new Data struct and inserts into the hash table via PLACEHOLDER() */
 void processPair(HashTable *hash_table, char *word1, char *word2) {
 
-    Data *new_data = malloc(sizeof(Data)); 
-    assert(new_data != NULL);
-
     printf("allocating space for strings in new Data object\n");
+    Data *new_data = malloc(sizeof(Data)); 
     new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
     new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
+
+    assert(new_data != NULL);
+    assert(new_data->string1 != NULL);
+    assert(new_data->string2 != NULL);
+    
 
     printf("copying word pair into the structure\n");
     /* load words into the structure */
@@ -79,11 +82,12 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     strcat(new_data->hash_field, word2);
     
     printf("Adding <%s> to the hash table\n", new_data->hash_field);
-    addEntry(hash_table, new_data);  // Testing now
-    printf("finished adding to has table\n");
+    // DEBUGGING so turning the hash table off
+    //addEntry(hash_table, new_data);  // Testing now
+    freeData(new_data);
 
     // DEBUGGING STUFF HERE
-    debug_array[debug_counter++] = new_data;
+    //debug_array[debug_counter++] = new_data;
     printf("highest collisions:%u\n", hash_table->highest_collision_count);
 }
 
