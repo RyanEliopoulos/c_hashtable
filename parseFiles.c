@@ -1,3 +1,6 @@
+/* Trying to get the hash_field into _Data.  */
+
+
 #include"parseFiles.h"
 #include"getWord.h"
 #include<string.h>
@@ -6,7 +9,7 @@
 HashTable *parseFiles(int count, int argc, char *argv[]) {
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
-    //HashTable *hash_table = newTable()
+    HashTable *hash_table = newTable();
     char *word1 = NULL;
     char *word2 = NULL;
     char *temp;
@@ -21,8 +24,8 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
             word2 = temp;
             
             if (word1 != NULL && word2 != NULL) {
-                printPairs_DEBUG(word1, word2);
-                //processPair(word1, word2); // Packages words into struct _Data and ships it off to a hash table.
+                //printPairs_DEBUG(word1, word2);
+                processPair(hash_table, word1, word2); // Packages words into struct _Data and ships it off to a hash table.
             }
         }
     }
@@ -40,11 +43,26 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 }
 
 
-void printPairs_DEBUG(char *word1, char *word2) {
+/* Packages the words into a new Data struct and inserts into the hash table via PLACEHOLDER() */
+void processPair(HashTable *hash_table, char *word1, char *word2) {
 
-    printf("word1: <%s>\n", word1);
-    printf("word2: <%s>\n\n", word2);
+    Data *new_data = malloc(sizeof(Data)); 
+    assert(new_data != NULL);
+    
+    
+    /* load words into the structure */
+    strcpy(new_data->string1, word1);
+    strcpy(new_data->string2, word2);
+    //new_data->string1 = word1; // Does this actually have the strings persist? I don't think so..
+    //new_data->string2 = word2;   
 
+    /* build string used for hashing */
+    char *hash_field  = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(*hash_field) );
+    strcpy(hash_field, word1);   
+    strcat(hash_field, word2); 
+    new_data->hash_field = hash_field;    
+    
+    //addEntry(hash_table, new_data); Have not begun testing at this point yet.
 }
 
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
