@@ -1,5 +1,6 @@
 #include<stdlib.h>
 #include"crc64.h"
+#include"userStruct_Data.h"
 
 #define INITIAL_TABLE_SIZE 227 // The 50th prime number. definitely not large enough.
 #define COLLISION_LIMIT 5
@@ -26,11 +27,15 @@ typedef struct _HashTable {
     unsigned int highest_collision_count; // Collision count of bucket with most collisions 
     unsigned long long int table_size; // Tracks the table size. Used in the mod part of the hash process
     int (*entryCompareFnx)(HashEntry *, HashEntry *); // Function used to compare the values of the hash table
-    void (*freeData)(Data *); /* responsible for free-ing all a Data object and all of its data structures. */
+    void (*freeDataFnx)(Data *); /* responsible for free-ing all a Data object and all of its data structures. */
     HashEntry **table_directory; 
 } HashTable;
 
+typedef void (*fnxFreeData)(Data *);
+typedef int (*entryCompareFnx)(HashEntry *, HashEntry *);
 
-HashTable *newTable();
+
+HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData); 
+//HashTable *newTable();
 void addEntry(HashTable *, Data *);
 HashEntry *newTableEntry(Data*);
