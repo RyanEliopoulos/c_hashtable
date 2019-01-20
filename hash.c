@@ -54,7 +54,7 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
     }
 }
 
-
+/* Helper function for addEntry. Converts a Data struct into a HashEntry struct */
 HashEntry *newTableEntry(Data *data_entry) {    
 
     /* Create and initialize new HashEntry */ 
