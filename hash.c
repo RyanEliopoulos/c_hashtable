@@ -4,6 +4,7 @@
 /* Will also want a function that unpacks all of the Data pointers into an array so that the table controller  */
 /* can can free the relevant Data fields. This unpacking function will free the HashEntry nodes */
 #include<stdio.h>
+
 #include"hash.h"
 
 /* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
@@ -46,6 +47,10 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
     if (hash_table->table_directory[hash] == NULL) { // Bucket is empty, assign and return
         hash_table->table_directory[hash] = new_entry;
         printf("added new entry to table\n");
+        printf("Now debugging freeEntry(). SO undoing that\n");
+        hash_table->table_directory[hash] = NULL;
+        hash_table->total_entries++;
+        freeHashEntry(hash_table->freeDataFnx, new_entry);
         return;
     } 
 
@@ -84,8 +89,11 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
 HashEntry *newTableEntry(Data *data_entry) {    
 
-    /* Create and initialize new HashEntry */ 
+    /* Create new HashEntry */ 
     HashEntry *new_entry = malloc(sizeof(HashEntry));
+    assert(new_entry != NULL);
+
+    /* Initialize new HashEntry */
     new_entry->data = data_entry;
     new_entry->next_node = NULL;
     new_entry->occurrences = 0;
@@ -93,4 +101,12 @@ HashEntry *newTableEntry(Data *data_entry) {
     return new_entry;
 }
 
+void freeTable(HashTable *hash_table) {
 
+
+}
+
+void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
+    freeData(hash_entry->data);
+    free(hash_entry);
+}

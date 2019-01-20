@@ -3,6 +3,7 @@
 
 #include"parseArgs.h"
 #include"parseFiles.h"
+#include<stdlib.h>
 
 void main(int argc, char* argv[]) {
     
@@ -10,8 +11,8 @@ void main(int argc, char* argv[]) {
     printf("Count is :%d\n", count);
 
     
-    parseFiles(count, argc, argv);
-    //HashTable *new_table = newTable();
-
-    printf("done\n");
+    HashTable *hash_table = parseFiles(count, argc, argv);
+    free(hash_table->table_directory);
+    free(hash_table);
+    //printf("total entries:%llu\n", hash_table->total_entries);
 }

@@ -1,6 +1,6 @@
 #include<stdlib.h>
+#include<assert.h>
 #include"crc64.h"
-#include"userStruct_Data.h"
 
 #define INITIAL_TABLE_SIZE 227 // The 50th prime number. definitely not large enough.
 #define COLLISION_LIMIT 5
@@ -39,3 +39,5 @@ HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData);
 //HashTable *newTable();
 void addEntry(HashTable *, Data *);
 HashEntry *newTableEntry(Data*);
+void freeTable(HashTable *);
+void freeHashEntry(fnxFreeData, HashEntry *);
