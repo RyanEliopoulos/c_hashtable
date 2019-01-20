@@ -1,11 +1,20 @@
 /* Trying to get the hash_field into _Data.  */
 
+#include<string.h>
 #include"parseFiles.h"
 #include"getWord.h"
-#include<string.h>
+
+// Debug stuff
+Data *debug_array[1000];
+int debug_counter = 0;
 
 /* Returns a hash table with all word pairs */
 HashTable *parseFiles(int count, int argc, char *argv[]) {
+
+    // DEBUG STATEMENT!
+    debug_init(); 
+    // END DEBUG STATEMENT
+
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
     HashTable *hash_table = newTable();
@@ -37,8 +46,15 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
     if (word1 == NULL) {
         fprintf(stderr, "Only one word found (and so no pairs)\n");
     }
-   
+  
     // return hash_table; 
+
+    // DEBUGGING STUFF HERE
+    for (int i = 0; i < 1000; i++) {
+        Data *temp = debug_array[i];
+        if (temp == NULL) break;
+        printf("Word1: <%s>, word2: <%s>, hash_field: <%s>\n", temp->string1, temp->string2, temp->hash_field); 
+    } 
 }
 
 
@@ -59,13 +75,15 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     
     printf("copy ok?\n");
     /* build string used for hashing */
-    char *hash_field  = malloc(100); // Malloc could have been fine :(
-    printf("Does this malloc fuck us?\n");
-    strcpy(hash_field, word1);   
-    strcat(hash_field, word2); 
-    new_data->hash_field = hash_field;    
+    new_data->hash_field = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(char)); // Malloc could have been fine :(
+    strcpy(new_data->hash_field, word1);
+    strcat(new_data->hash_field, word2);
+
     printf("data with <%s> is ready to be inserted\n", new_data->hash_field); 
     //addEntry(hash_table, new_data); Have not begun testing at this point yet.
+
+    // DEBUGGING STUFF HERE
+    debug_array[debug_counter++] = new_data;
 }
 
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
@@ -81,6 +99,9 @@ int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
     return 1;
 }
 
+void debug_init() {
+    for (int i = 0; i < 1000; i++) debug_array[i] = NULL;
+}
 void printPairs_DEBUG(char *word1, char *word2) {
 
     printf("word1: <%s>\n", word1);
