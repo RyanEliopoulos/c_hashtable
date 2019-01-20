@@ -8,20 +8,26 @@
 
 /* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
 /* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
-HashTable *newTable(int (*entryCmpr)(HashEntry*, HashEntry*)) {
+HashTable *newTable(unsigned long long int table_size, 
+                        int (*entryCmpr)(HashEntry*, HashEntry*), void (*freeDataFnx)(Data *)) {
 
     HashTable *new_table= malloc(sizeof(HashTable));
     
-    /* Initialize table */
+    /* Initialize table values */
     new_table->total_entries = 0;
     new_table->unique_entries = 0;
     new_table->highest_collision_count = 0;
     new_table->total_collisions = 0;
+
+    /* Initializing table helper functions */
     new_table->entryCompareFnx = entryCmpr; 
-    new_table->table_size = INITIAL_TABLE_SIZE;
-    new_table->table_directory = malloc(sizeof(HashEntry *) * INITIAL_TABLE_SIZE);
- 
-    for (int i = 0; i < INITIAL_TABLE_SIZE; i++) {
+    new_table->freeDataFnx = freeDataFnx;
+
+    /* Initializing table */
+    new_table->table_size = table_size;
+    new_table->table_directory = malloc(sizeof(HashEntry *) * table_size);
+
+    for (int i = 0; i < table_size; i++) {
         new_table->table_directory[i] == NULL;
     }
     return new_table; 
