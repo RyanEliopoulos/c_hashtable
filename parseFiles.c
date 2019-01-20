@@ -17,7 +17,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
-    HashTable *hash_table = newTable();
+    HashTable *hash_table = newTable(&entryCompareFunction);
     char *word1 = NULL;
     char *word2 = NULL;
     char *temp;
@@ -64,19 +64,24 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     Data *new_data = malloc(sizeof(Data)); 
     assert(new_data != NULL);
 
+    printf("allocating space for strings in new Data object\n");
     new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
     new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
 
+    printf("copying word pair into the structure\n");
     /* load words into the structure */
     strcpy(new_data->string1, word1);
     strcpy(new_data->string2, word2);
-    
+   
+     
     /* build string used for hashing */
-    new_data->hash_field = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(char)); // Malloc could have been fine :(
+    new_data->hash_field = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(char)); 
     strcpy(new_data->hash_field, word1);
     strcat(new_data->hash_field, word2);
-
-    //addEntry(hash_table, new_data); Have not begun testing at this point yet.
+    
+    printf("Adding <%s> to the hash table\n", new_data->hash_field);
+    addEntry(hash_table, new_data);  // Testing now
+    printf("finished adding to has table\n");
 
     // DEBUGGING STUFF HERE
     debug_array[debug_counter++] = new_data;
