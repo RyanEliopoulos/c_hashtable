@@ -17,7 +17,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
-    HashTable *hash_table = newTable(&entryCompareFunction, &freeData);
+    HashTable *hash_table = newTable(INITIAL_TABLE_SIZE, &entryCompareFunction, &freeData);
     char *word1 = NULL;
     char *word2 = NULL;
     char *temp;
