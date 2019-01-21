@@ -65,6 +65,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
         //printf("about to compare hash values\n");
         if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {  // True if entries match.
             temp_entry->occurrences++; 
+            freeHashEntry(hash_table->freeDataFnx, new_entry);
             return;
         }
         /* current entry didn't match */

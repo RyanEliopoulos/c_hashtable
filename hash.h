@@ -2,8 +2,8 @@
 #include<assert.h>
 #include"crc64.h"
 
-#define INITIAL_TABLE_SIZE 227 // The 50th prime number. definitely not large enough.
-#define COLLISION_LIMIT 5
+#define INITIAL_TABLE_SIZE 277//227 // The 50th prime number. definitely not large enough.
+#define COLLISION_LIMIT 50
 
 typedef struct _Data {
     char *string1;
