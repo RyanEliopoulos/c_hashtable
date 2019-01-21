@@ -2,16 +2,9 @@
 
 #include"parseFiles.h"
 
-// Debug stuff
-Data *debug_array[1000];
-int debug_counter = 0;
 
 /* Returns a hash table with all word pairs */
 HashTable *parseFiles(int count, int argc, char *argv[]) {
-
-    // DEBUG STATEMENT!
-    //debug_init(); 
-    // END DEBUG STATEMENT
 
     int i = (count == -1) ? 1: 2;  // *filepath[] index
 
@@ -32,11 +25,13 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
             if (word1 != NULL && word2 != NULL) {
                 processPair(hash_table, word1, word2); // Packages words into struct _Data and ships it off to a hash table.
             }
+            /* realized late that getNextWord allocates heap memory. This is a fix */
             if ( word1 != NULL) {
                 free(word1);
-                word1 == NULL;
+                word1 = NULL;
             }
         }
+        /* continuation of getNextWord fix */
         if ( word2 != NULL) {
             free(word2);
             word2 = NULL;
@@ -52,7 +47,6 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
     if ( j == 1) {
         fprintf(stderr, "Only one word found (and so no pairs)\n");
     }
-  
     return hash_table;
 }
 
@@ -81,10 +75,12 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     strcpy(new_data->hash_field, word1);
     strcat(new_data->hash_field, word2);
     
-    printf("Adding <%s> to the hash table\n", new_data->hash_field);
+    //printf("Adding <%s> to the hash table\n", new_data->hash_field);
     // DEBUGGING so turning the hash table off
-    tableInsert(hash_table, new_data);  // Testing now
+
+    /* free's and allocs match until we start inserting into the table */
     //freeData(new_data);
+    tableInsert(hash_table, new_data);  // Testing now
 
     // DEBUGGING STUFF HERE
     //debug_array[debug_counter++] = new_data;
@@ -112,7 +108,4 @@ void freeData(Data *data) {
     free(data);
 }
 
-void debug_init() {
-    for (int i = 0; i < 1000; i++) debug_array[i] = NULL;
-}
 
