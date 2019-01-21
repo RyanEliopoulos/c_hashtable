@@ -57,12 +57,12 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* Will iterate through bucket list, incrementing a matching entry or adding the new unique entry to the end. */
     HashEntry *temp_entry =  hash_table->table_directory[hash];
     unsigned long int bucket_collisions = 1; /* inventories the length of a bucket's linked-list */ 
-    printf("About to enter the list traversal while loop\n");
+    //printf("About to enter the list traversal while loop\n");
     while ( temp_entry->next_node != NULL ) {
 
 
         /* return if a HashEntry match is found */
-        printf("about to compare hash values\n");
+        //printf("about to compare hash values\n");
         if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {  // True if entries match.
             temp_entry->occurrences++; 
             return;
@@ -71,10 +71,11 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
         temp_entry = temp_entry->next_node; 
         bucket_collisions++;
     }
-    printf("make it to \"Checking last values\"\n");   
+    //printf("make it to \"Checking last values\"\n");   
     /* Checking the last value in the list */
     if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {
         temp_entry->occurrences++;
+        freeHashEntry(hash_table->freeDataFnx, new_entry);
     }
     /* Data object fields don't yet exist within the table */
     /* add the HashEntry to the table. */
@@ -85,14 +86,14 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
             hash_table->highest_collision_count = bucket_collisions;
         }
         if (hash_table->highest_collision_count >= COLLISION_LIMIT ) { 
-            printf("Collision limit exceeded. Currently at %llu collisions\n", bucket_collisions);
+            //printf("Collision limit exceeded. Currently at %lu collisions\n", bucket_collisions);
             // resizeTable(HashTable *hash_table);
         }
     }
 }
 
 /* resize criteria: maximum per-bucket collision reached */
-void resizeTable(HashTable *hash_Table) {
+void resizeTable(HashTable *hash_table) {
 
     /* retrieve entries for re-hashing */ 
     HashEntry **unpacked_table = unpackTableEntries(hash_table);
@@ -180,7 +181,7 @@ void debug_traverseTable(HashTable *hash_table) {
         while ( entry != NULL) {
             char *string1 = entry->data->string1;
             char *string2 = entry->data->string2;
-            printf("<%s>, <%s>\n", string1, string2);
+            //printf("<%s>, <%s>\n", string1, string2);
             temp = entry;  // DEBUG - used for attempt to free whole table
             entry = entry->next_node;
             freeHashEntry(hash_table->freeDataFnx, temp); // DEBUG - attempting to free al ltable values
