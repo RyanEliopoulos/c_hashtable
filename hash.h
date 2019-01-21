@@ -37,8 +37,9 @@ typedef int (*entryCompareFnx)(HashEntry *, HashEntry *);
 
 HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData); 
 //HashTable *newTable();
-void addEntry(HashTable *, Data *);
-HashEntry *newTableEntry(Data*);
+void addEntry(HashTable *, HashEntry *);
+void tableInsert(HashTable *, Data *);
+HashEntry *createHashEntry(Data*);
 HashEntry **unpackTableEntries(HashTable *);
 void freeTable(HashTable *);
 void freeHashEntry(fnxFreeData, HashEntry *);

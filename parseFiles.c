@@ -83,7 +83,7 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     
     printf("Adding <%s> to the hash table\n", new_data->hash_field);
     // DEBUGGING so turning the hash table off
-    addEntry(hash_table, new_data);  // Testing now
+    tableInsert(hash_table, new_data);  // Testing now
     //freeData(new_data);
 
     // DEBUGGING STUFF HERE

@@ -33,13 +33,10 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 }
 
 
-/* Handles inserting new Data into the hash table. */
-/* Need to add: state tracking */
-void addEntry(HashTable *hash_table, Data *data_entry) {
+/* Insertion logic for the hash table */
+void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 
-    unsigned long long int hash = crc64(data_entry->hash_field) % hash_table->table_size; // Calculating hash value
-    //printf("successfully hashed\n");    
-    HashEntry *new_entry = newTableEntry(data_entry); // Creating an entry node for the hash table
+    unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; // Calculating hash value
    
     /* Placing the new_entry into the bucket */ 
     if (hash_table->table_directory[hash] == NULL) { // Bucket is empty, assign and return
@@ -86,8 +83,15 @@ void addEntry(HashTable *hash_table, Data *data_entry) {
     }
 }
 
+/* Entry point into the hash table code */
+/* packages the user-defined Data * into a table element */
+void tableInsert(HashTable *hash_table, Data *data_entry) {
+    HashEntry *new_entry = createHashEntry(data_entry);
+    addEntry(hash_table, new_entry);
+}
+
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
-HashEntry *newTableEntry(Data *data_entry) {    
+HashEntry *createHashEntry(Data *data_entry) {    
 
     /* Create new HashEntry */ 
     HashEntry *new_entry = malloc(sizeof(HashEntry));
@@ -103,25 +107,24 @@ HashEntry *newTableEntry(Data *data_entry) {
 
 /* Puts all hash entries into a HashEntry array */
 /* Useful for re-hashing a table and qsort() */
-
-/* link traversing may still be broken. We are missing one entry free and its the chained value */
-/* LOSING THE CHAIN IN HERE SOMEHOW! */
 HashEntry **unpackTableEntries(HashTable *hash_table) {
 
-    /* Initialize pointers for an 'array' of HashEntry pointers */ 
+    /* Prepare destination of 'flattened' hash table */
     HashEntry **unpacked_array = malloc( hash_table->table_size * sizeof(HashEntry *) );
+
+    /* initialize values */
     for (int i = 0; i < hash_table->table_size; i++) {
-        //*(unpacked_array + i) = NULL;
         unpacked_array[i] = NULL;
     } 
-    int j = 0; /* next free slot in entry_array */
 
-    /* check each bucket for entries */ 
+    /* begining traversal of the hash table */ 
+    int j = 0; /* index for the unpacked_array */
+
+    /* check each bucket in the table for HashEntry */ 
     for (int i = 0; i < hash_table->table_size; i++) {
-        /* de-refence the hash table directory */
-        HashEntry *list_head = hash_table->table_directory[i];//(*hash_table->table_directory + i);
-    
-        /* This while loop is whats causing the segfaults */
+        HashEntry *list_head = hash_table->table_directory[i];
+
+        /* iterate through the list chain, if it exists */
         while (list_head != NULL) {
             unpacked_array[j++] = list_head;
             list_head = list_head->next_node;
