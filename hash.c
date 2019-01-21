@@ -34,6 +34,8 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 
 
 /* Insertion logic for the hash table */
+/* distinct from tableInsert() so a table can re-hash */
+/* already existing HashEntry objects upon re-size */
 void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 
     unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; // Calculating hash value
@@ -54,16 +56,18 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* Bucket is not empty */
     /* Will iterate through bucket list, incrementing a matching entry or adding the new unique entry to the end. */
     HashEntry *temp_entry =  hash_table->table_directory[hash];
-    unsigned long int bucket_collisions = 1;
+    unsigned long int bucket_collisions = 1; /* inventories the length of a bucket's linked-list */ 
     printf("About to enter the list traversal while loop\n");
     while ( temp_entry->next_node != NULL ) {
 
-        /* Comparing HashEntry values */
+
+        /* return if a HashEntry match is found */
         printf("about to compare hash values\n");
         if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {  // True if entries match.
             temp_entry->occurrences++; 
             return;
         }
+        /* current entry didn't match */
         temp_entry = temp_entry->next_node; 
         bucket_collisions++;
     }
@@ -72,14 +76,41 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {
         temp_entry->occurrences++;
     }
+    /* Data object fields don't yet exist within the table */
+    /* add the HashEntry to the table. */
+    /* grow the table if the per-bucket collision limit has been exceeded */
     else {
-        temp_entry->next_node = new_entry; // new_entry is unique to the hash table
-        if (bucket_collisions > hash_table->highest_collision_count) {
+        temp_entry->next_node = new_entry; // new_entry is unique to the hash tablebbb
+        if (bucket_collisions > hash_table->highest_collision_count) { /* update table stats */
             hash_table->highest_collision_count = bucket_collisions;
         }
-        if (hash_table->highest_collision_count >= COLLISION_LIMIT ) {
-            // growTable(HashTable *hash_table);
+        if (hash_table->highest_collision_count >= COLLISION_LIMIT ) { 
+            printf("Collision limit exceeded. Currently at %llu collisions\n", bucket_collisions);
+            // resizeTable(HashTable *hash_table);
         }
+    }
+}
+
+/* resize criteria: maximum per-bucket collision reached */
+void resizeTable(HashTable *hash_Table) {
+
+    /* retrieve entries for re-hashing */ 
+    HashEntry **unpacked_table = unpackTableEntries(hash_table);
+    unsigned long long int old_size = hash_table->table_size; /* index for later iteration */
+
+    /* re-size */
+    free(hash_table->table_directory);
+    hash_table->table_size = hash_table->table_size * 3;
+    hash_table->table_directory = malloc( sizeof(HashEntry *) * hash_table->table_size);
+
+    /* initialize new directory */
+    for (int i = 0; i < hash_table->table_size; i++ ) {
+        hash_table->table_directory[i] = NULL;
+    }
+
+    /* re-hash existing table elements */
+    for ( int i = 0; i < old_size; i++ ) { 
+        addEntry(hash_table, unpacked_table[i]);  
     }
 }
 
@@ -139,7 +170,6 @@ void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
     free(hash_entry);
 }
 
-// Also need to add logic to traverse a list, if one is encountered
 // This has confirmed all word pairs are put into the table.
 void debug_traverseTable(HashTable *hash_table) {
     
