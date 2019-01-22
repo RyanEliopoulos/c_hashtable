@@ -14,13 +14,27 @@ void main(int argc, char* argv[]) {
     HashTable *hash_table = parseFiles(count, argc, argv);
 
 
-    HashEntry **unpacked_entry_array = unpackTableEntries(hash_table);
+    HashEntry **sorted_entries = sortPairs(hash_table);
+
+    char *string1;
+    char *string2;  
+    for (int i = 0; i < hash_table->unique_entries; i++ ) {
+        string1 = sorted_entries[i]->data->string1;
+        string2 = sorted_entries[i]->data->string2;
+        printf("<%s>, <%s>, %llu\n", string1, string2, sorted_entries[i]->occurrences);
+
+    } 
+    //HashEntry **unpacked_entry_array = unpackTableEntries(hash_table);
+
+    // This is where the sortPairs() call goes
+    // sortPairs(hash_table); // calls unpackTableEntries and qsort()
+
     // BEGIN: these three lines free all elements of the table and sub-structures.
     /* So, the logc within the unpackTableEntries() is likely causing the segfault */
     debug_traverseTable(hash_table);
     free(hash_table->table_directory);
     free(hash_table);
-    free(unpacked_entry_array);
+    //free(unpacked_entry_array);
     // END
     
     // DEBUG - should be getting a hash table with complete set of values.

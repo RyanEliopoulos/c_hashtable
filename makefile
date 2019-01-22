@@ -1,5 +1,5 @@
-main: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o
-	gcc -o main main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o
+main: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o 
+	gcc -o main main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o 
 main.o: main.c
 	gcc -c main.c
 hash.o: hash.c hash.h
