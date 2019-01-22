@@ -13,28 +13,34 @@ void main(int argc, char* argv[]) {
     
     HashTable *hash_table = parseFiles(count, argc, argv);
 
+
+
+    HashEntry **unpacked_entry_array = unpackTableEntries(hash_table);
     // BEGIN: these three lines free all elements of the table and sub-structures.
     /* So, the logc within the unpackTableEntries() is likely causing the segfault */
-    debug_traverseTable(hash_table);
-    free(hash_table->table_directory);
-    free(hash_table);
+    //debug_traverseTable(hash_table);
+    //free(hash_table->table_directory);
+    //free(hash_table);
+    //free(unpacked_entry_array);
     // END
     
     // DEBUG - should be getting a hash table with complete set of values.
     // Now will test the unpack function
 
-   // HashEntry **unpacked_entry_array = unpackTableEntries(hash_table);
     //printf("in main, beginning to free\n");        
-    //for (int i = 0; i < hash_table->table_size; i++) {
-        //if (unpacked_entry_array[i] != NULL) {
-            //printf("<%s>\n", unpacked_entry_array[i]->data->hash_field);
-            //freeHashEntry(hash_table->freeDataFnx, unpacked_entry_array[i]);
-        //}
-    //}    
-
-    //free(hash_table->table_directory);
-    //free(hash_table);
-    //free(unpacked_entry_array);
+    //printf("Unique entries: %llu\n", hash_table->unique_entries);
+    for (int i = 0; i < hash_table->unique_entries; i++) {
+        if (unpacked_entry_array[i] != NULL) {
+            printf("<%s>\n", unpacked_entry_array[i]->data->hash_field);
+            freeHashEntry(hash_table->freeDataFnx, unpacked_entry_array[i]);
+       }
+        else {
+            printf("Got a null value somehow\n");
+        }
+    }    
+    free(hash_table->table_directory);
+    free(hash_table);
+    free(unpacked_entry_array);
     //for (int i = 0; i < hash_table->table_size; i++) {
         //if (*(unpacked_entry_array + i) != NULL) {
             //printf("hello!\n");

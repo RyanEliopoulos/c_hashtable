@@ -45,7 +45,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
         hash_table->table_directory[hash] = new_entry;
         //printf("added new entry to table\n");
         hash_table->total_entries++;
-
+        hash_table->unique_entries++;
         // DEBEUG STUFF. Just immediately removes the entry. Prevents chaining
         //printf("Now debugging freeEntry(). SO undoing that\n");
         //hash_table->table_directory[hash] = NULL;
@@ -166,7 +166,7 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 
         /* iterate through the list chain, if it exists */
         while (list_head != NULL) {
-            //unpacked_array[j++] = list_head; /* this line is causing the write errors somehow */
+            unpacked_array[j++] = list_head; /* this line is causing the write errors somehow */
             list_head = list_head->next_node;
         }        
     }
