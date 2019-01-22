@@ -43,6 +43,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* Placing the new_entry into the bucket */ 
     if (hash_table->table_directory[hash] == NULL) { // Bucket is empty, assign and return
         hash_table->table_directory[hash] = new_entry;
+        new_entry->occurrences++; 
         //printf("added new entry to table\n");
         hash_table->total_entries++;
         hash_table->unique_entries++;
@@ -85,6 +86,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* grow the table if the per-bucket collision limit has been exceeded */
     else {
         temp_entry->next_node = new_entry; // new_entry is unique to the hash tablebbb
+        new_entry->occurrences++;
         hash_table->unique_entries++;  /* required for table operations */
         if (bucket_collisions > hash_table->highest_collision_count) { /* update table stats */
             hash_table->highest_collision_count = bucket_collisions;
@@ -114,7 +116,6 @@ void resizeTable(HashTable *hash_table) {
     free(hash_table->table_directory);
     hash_table->table_directory = malloc( hash_table->table_size * sizeof(HashEntry *) );
 
-    
     /* initialize new directory */
     for (int i = 0; i < hash_table->table_size; i++ ) {
         hash_table->table_directory[i] = NULL;
@@ -129,8 +130,10 @@ void resizeTable(HashTable *hash_table) {
     for ( int i = 0; i < entry_count; i++ ) { 
         addEntry(hash_table, unpacked_table[i]);  
     }
-  
+
+    /* No longer need the unpacked table */
     free(unpacked_table); 
+    /* But the new table may still have too many collisions */
     if (hash_table->highest_collision_count > COLLISION_LIMIT ) {
         resizeTable(hash_table);
     } 
