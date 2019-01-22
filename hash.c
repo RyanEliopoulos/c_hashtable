@@ -101,7 +101,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 /* resize criteria: maximum per-bucket collision reached */
 /* Testing */
 void resizeTable(HashTable *hash_table) {
-
+    printf("resizing table\n");
     /* retrieve entries for re-hashing */ 
     HashEntry **unpacked_table = unpackTableEntries(hash_table);
     unsigned long long int entry_count = hash_table->unique_entries; /* Length of unpacked_table */
@@ -131,9 +131,9 @@ void resizeTable(HashTable *hash_table) {
     }
   
     free(unpacked_table); 
-    //if (hash_table->highest_collision_count > COLLISION_LIMIT ) {
-        //resizeTable(hash_table);
-    //} 
+    if (hash_table->highest_collision_count > COLLISION_LIMIT ) {
+        resizeTable(hash_table);
+    } 
 }
 
 /* Entry point into the hash table code */
@@ -142,7 +142,6 @@ void tableInsert(HashTable *hash_table, Data *data_entry) {
     HashEntry *new_entry = createHashEntry(data_entry);
     addEntry(hash_table, new_entry);
     if ( hash_table->highest_collision_count > COLLISION_LIMIT ) {
-        printf("Resizing table\n");
         resizeTable(hash_table); 
     }
 }
