@@ -89,37 +89,51 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
         if (bucket_collisions > hash_table->highest_collision_count) { /* update table stats */
             hash_table->highest_collision_count = bucket_collisions;
         }
-        if (hash_table->highest_collision_count >= COLLISION_LIMIT ) { 
+        //if (hash_table->highest_collision_count >= COLLISION_LIMIT ) { 
             //printf("Collision limit exceeded. Currently at %lu collisions\n", bucket_collisions);
             //printf("Resizing Table\n");
             //resizeTable(hash_table);
-        }
+        //}
     }
 }
 
 /* Not implemeted yet */
 /* resize criteria: maximum per-bucket collision reached */
+/* Testing */
 void resizeTable(HashTable *hash_table) {
 
     /* retrieve entries for re-hashing */ 
     HashEntry **unpacked_table = unpackTableEntries(hash_table);
-    unsigned long long int old_size = hash_table->table_size; /* index for later iteration */
+    unsigned long long int entry_count = hash_table->unique_entries; /* Length of unpacked_table */
 
     /* re-size */
+    hash_table->highest_collision_count = 0;
+    hash_table->unique_entries = 0; /* going to be counted again in addEntry */
+    unsigned long long int old_size = hash_table->table_size; /* index for later iteration */
+    hash_table->table_size = hash_table->table_size * GROWTH_FACTOR;
     free(hash_table->table_directory);
-    hash_table->table_size = hash_table->table_size * 3;
-    hash_table->table_directory = malloc( sizeof(HashEntry *) * hash_table->table_size);
+    hash_table->table_directory = malloc( hash_table->table_size * sizeof(HashEntry *) );
 
+    
     /* initialize new directory */
     for (int i = 0; i < hash_table->table_size; i++ ) {
         hash_table->table_directory[i] = NULL;
     }
 
+    /* break outdated linked-lists */
+    for (int i = 0; i < entry_count; i++ ) {
+        unpacked_table[i]->next_node = NULL;
+    }
+
     /* re-hash existing table elements */
-    hash_table->unique_entries = 0; /* going to be counted again in addEntry */
-    for ( int i = 0; i < old_size; i++ ) { 
+    for ( int i = 0; i < entry_count; i++ ) { 
         addEntry(hash_table, unpacked_table[i]);  
     }
+  
+    free(unpacked_table); 
+    //if (hash_table->highest_collision_count > COLLISION_LIMIT ) {
+        //resizeTable(hash_table);
+    //} 
 }
 
 /* Entry point into the hash table code */
@@ -127,6 +141,10 @@ void resizeTable(HashTable *hash_table) {
 void tableInsert(HashTable *hash_table, Data *data_entry) {
     HashEntry *new_entry = createHashEntry(data_entry);
     addEntry(hash_table, new_entry);
+    if ( hash_table->highest_collision_count > COLLISION_LIMIT ) {
+        printf("Resizing table\n");
+        resizeTable(hash_table); 
+    }
 }
 
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
@@ -146,7 +164,7 @@ HashEntry *createHashEntry(Data *data_entry) {
 
 /* Puts all hash entries into a HashEntry array */
 /* Useful for re-hashing a table and qsort() */
-/* NOTE: Seems like this function does not work correctly. */
+/* Looks like this works now!! */
 HashEntry **unpackTableEntries(HashTable *hash_table) {
 
     /* Prepare destination of 'flattened' hash table */
@@ -166,7 +184,7 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 
         /* iterate through the list chain, if it exists */
         while (list_head != NULL) {
-            unpacked_array[j++] = list_head; /* this line is causing the write errors somehow */
+            unpacked_array[j++] = list_head; 
             list_head = list_head->next_node;
         }        
     }

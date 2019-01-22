@@ -4,6 +4,7 @@
 
 #define INITIAL_TABLE_SIZE 277//227 // The 50th prime number. definitely not large enough.
 #define COLLISION_LIMIT 50
+#define GROWTH_FACTOR 3
 
 typedef struct _Data {
     char *string1;
