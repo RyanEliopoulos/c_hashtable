@@ -11,3 +11,5 @@ void processPair(HashTable *, char *, char *);
 int entryCompareFunction(HashEntry *, HashEntry *);
 void freeData(Data *);
 void debug_init();
+HashEntry **sortPairs(HashTable *);
+int pairCompare(HashEntry *, HashEntry *);

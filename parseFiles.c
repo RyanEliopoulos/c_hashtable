@@ -54,15 +54,16 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 /* Packages the words into a new Data struct and inserts into the hash table via PLACEHOLDER() */
 void processPair(HashTable *hash_table, char *word1, char *word2) {
 
-    //printf("allocating space for strings in new Data object\n");
+    /* creating top-level structure */
     Data *new_data = malloc(sizeof(Data)); 
-    new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
-    new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
-
     assert(new_data != NULL);
+
+    /* creating structure elements */
+    new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
     assert(new_data->string1 != NULL);
+    new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
     assert(new_data->string2 != NULL);
-    
+
 
     //printf("copying word pair into the structure\n");
     /* load words into the structure */
@@ -106,6 +107,29 @@ void freeData(Data *data) {
     free(data->string2);
     free(data->hash_field);
     free(data);
+}
+
+
+
+
+int comparator(const void *entry1, const void *entry2) {
+
+    if ( ((struct _HashEntry *)entry1)->occurrences > ((struct _HashEntry *)entry2)->occurrences ) return 1;
+    
+    if ( ((struct _HashEntry *)entry1)->occurrences == ((struct _HashEntry *)entry2)->occurrences ) return 0;
+
+    return -1;
+}
+
+HashEntry **sortPairs(HashTable *hash_table) {
+    
+    HashEntry **unpacked_array = unpackTableEntries(hash_table);
+    int (*cmp)(const void *, const void *) = comparator;
+    
+    /* Could be that using the unsigned long long for unique is breaking this. Would need to iteratively sort */
+    qsort( unpacked_array, hash_table->unique_entries, sizeof(HashTable *), cmp);
+
+    return unpacked_array; /* sorted */
 }
 
 
