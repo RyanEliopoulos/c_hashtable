@@ -65,6 +65,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
         //printf("about to compare hash values\n");
         if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {  // True if entries match.
             temp_entry->occurrences++; 
+            /* this word pair already exists in the table. this entry is unnecessary */
             freeHashEntry(hash_table->freeDataFnx, new_entry);
             return;
         }
@@ -76,6 +77,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* Checking the last value in the list */
     if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {
         temp_entry->occurrences++;
+        /* this word pair already exists in the table. this entry is unnecessary */
         freeHashEntry(hash_table->freeDataFnx, new_entry);
     }
     /* Data object fields don't yet exist within the table */
@@ -83,16 +85,19 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* grow the table if the per-bucket collision limit has been exceeded */
     else {
         temp_entry->next_node = new_entry; // new_entry is unique to the hash tablebbb
+        hash_table->unique_entries++;  /* required for table operations */
         if (bucket_collisions > hash_table->highest_collision_count) { /* update table stats */
             hash_table->highest_collision_count = bucket_collisions;
         }
         if (hash_table->highest_collision_count >= COLLISION_LIMIT ) { 
             //printf("Collision limit exceeded. Currently at %lu collisions\n", bucket_collisions);
-            // resizeTable(HashTable *hash_table);
+            //printf("Resizing Table\n");
+            //resizeTable(hash_table);
         }
     }
 }
 
+/* Not implemeted yet */
 /* resize criteria: maximum per-bucket collision reached */
 void resizeTable(HashTable *hash_table) {
 
@@ -111,6 +116,7 @@ void resizeTable(HashTable *hash_table) {
     }
 
     /* re-hash existing table elements */
+    hash_table->unique_entries = 0; /* going to be counted again in addEntry */
     for ( int i = 0; i < old_size; i++ ) { 
         addEntry(hash_table, unpacked_table[i]);  
     }
@@ -140,13 +146,14 @@ HashEntry *createHashEntry(Data *data_entry) {
 
 /* Puts all hash entries into a HashEntry array */
 /* Useful for re-hashing a table and qsort() */
+/* NOTE: Seems like this function does not work correctly. */
 HashEntry **unpackTableEntries(HashTable *hash_table) {
 
     /* Prepare destination of 'flattened' hash table */
-    HashEntry **unpacked_array = malloc( hash_table->table_size * sizeof(HashEntry *) );
+    HashEntry **unpacked_array = malloc( hash_table->unique_entries * sizeof(HashEntry *) );
 
     /* initialize values */
-    for (int i = 0; i < hash_table->table_size; i++) {
+    for (int i = 0; i < hash_table->unique_entries ; i++) {
         unpacked_array[i] = NULL;
     } 
 
@@ -159,7 +166,7 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 
         /* iterate through the list chain, if it exists */
         while (list_head != NULL) {
-            unpacked_array[j++] = list_head;
+            //unpacked_array[j++] = list_head; /* this line is causing the write errors somehow */
             list_head = list_head->next_node;
         }        
     }
