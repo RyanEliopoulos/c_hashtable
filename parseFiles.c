@@ -112,22 +112,46 @@ void freeData(Data *data) {
 
 
 
-int comparator(const void *entry1, const void *entry2) {
+int comparator(const void *e1, const void *e2) {
 
-    if ( ((struct _HashEntry *)entry1)->occurrences > ((struct _HashEntry *)entry2)->occurrences ) return 1;
+    HashEntry **entry1 = (HashEntry **)e1;
+    HashEntry **entry2 = (HashEntry **)e2;
+
+    if ( (*entry1)->occurrences > (*entry2)->occurrences ) {
+        return -1;
+    }
+
+    if ( (*entry1)->occurrences == (*entry2)->occurrences ) {
+        return 0;
+    }
+    return 1;
     
-    if ( ((struct _HashEntry *)entry1)->occurrences == ((struct _HashEntry *)entry2)->occurrences ) return 0;
+    /*
+    HashEntry *dev = (struct _HashEntry *)entry1;
+    //printf("%llu\n", dev->occurrences);
 
+    if ( ((struct _HashEntry *)entry1)->occurrences > ((struct _HashEntry *)entry2)->occurrences ) {
+        //printf("greater\n");
+        return 1;
+    } 
+
+
+    if ( ((struct _HashEntry *)entry1)->occurrences == ((struct _HashEntry *)entry2)->occurrences ) {
+        printf("equal\n");
+        //printf("<%s>, <%s>\n", (struct _HashEntry *)entry1->data->hash_field, (struct _HashEntry *)entry1->data->hash_field);
+        return 0;
+    }
+    //printf("less than\n");
     return -1;
+    */
 }
 
 HashEntry **sortPairs(HashTable *hash_table) {
-    
     HashEntry **unpacked_array = unpackTableEntries(hash_table);
-    int (*cmp)(const void *, const void *) = comparator;
+    //int (*cmp)(const void *, const void *) = comparator;
     
     /* Could be that using the unsigned long long for unique is breaking this. Would need to iteratively sort */
-    qsort( unpacked_array, hash_table->unique_entries, sizeof(HashTable *), cmp);
+    qsort( (void *)unpacked_array, hash_table->unique_entries, sizeof(HashTable *), comparator);
 
     return unpacked_array; /* sorted */
 }
