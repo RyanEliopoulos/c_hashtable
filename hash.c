@@ -1,8 +1,4 @@
-/* Going to want a hash function that unpacks all HashEntry nodes into a linear array. */
 
-/* Will then use this array in qsort(). */
-/* Will also want a function that unpacks all of the Data pointers into an array so that the table controller  */
-/* can can free the relevant Data fields. This unpacking function will free the HashEntry nodes */
 #include<stdio.h>
 #include"hash.h"
 
@@ -11,6 +7,7 @@
 HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr, fnxFreeData freeDataFnx){
 
     HashTable *new_table= malloc(sizeof(HashTable));
+    assert(new_table != NULL);
     
     /* Initialize table values */
     new_table->total_entries = 0;
@@ -25,6 +22,7 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
     /* Initializing table */
     new_table->table_size = table_size;
     new_table->table_directory = malloc(sizeof(HashEntry *) * table_size);
+    assert(new_tabe->table_directory != NULL);
 
     for (int i = 0; i < table_size; i++) {
         new_table->table_directory[i] = NULL;
@@ -113,8 +111,11 @@ void resizeTable(HashTable *hash_table) {
     hash_table->unique_entries = 0; /* going to be counted again in addEntry */
     unsigned long long int old_size = hash_table->table_size; /* index for later iteration */
     hash_table->table_size = hash_table->table_size * GROWTH_FACTOR;
+
+    /* manage memory */
     free(hash_table->table_directory);
     hash_table->table_directory = malloc( hash_table->table_size * sizeof(HashEntry *) );
+    assert(hash_table->table_directory != NULL);
 
     /* initialize new directory */
     for (int i = 0; i < hash_table->table_size; i++ ) {
@@ -171,6 +172,7 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 
     /* Prepare destination of 'flattened' hash table */
     HashEntry **unpacked_array = malloc( hash_table->unique_entries * sizeof(HashEntry *) );
+    assert(unpacked_array != NULL);
 
     /* initialize values */
     for (int i = 0; i < hash_table->unique_entries ; i++) {
@@ -209,7 +211,6 @@ void debug_traverseTable(HashTable *hash_table) {
         while ( entry != NULL) {
             char *string1 = entry->data->string1;
             char *string2 = entry->data->string2;
-            //printf("<%s>, <%s>\n", string1, string2);
             temp = entry;  // DEBUG - used for attempt to free whole table
             entry = entry->next_node;
             freeHashEntry(hash_table->freeDataFnx, temp); // DEBUG - attempting to free al ltable values

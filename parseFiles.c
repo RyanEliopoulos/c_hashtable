@@ -77,6 +77,7 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
    
     /* combine the strings for hashing */
     new_data->hash_field = malloc((DICT_MAX_WORD_LEN * 2) * sizeof(char)); 
+    assert(new_data->hash_field != NULL);
     strcpy(new_data->hash_field, word1);
     strcat(new_data->hash_field, word2);
     
