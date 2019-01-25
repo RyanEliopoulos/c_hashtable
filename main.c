@@ -74,6 +74,7 @@ void main(int argc, char* argv[]) {
 
 void printWords(int count, HashEntry **sorted_array) {
 
+    printf("<%s> <%s> %d\n", sorted_array[0]->data->string1, sorted_array[0]->data->string2, sorted_array[0]->occurrences);
     for (int i = 0; i < count; i++) {
             
         /* retrieve the entry's string values */ 
@@ -83,6 +84,8 @@ void printWords(int count, HashEntry **sorted_array) {
         /* Transfer the strings into a single string */
         char final_string[DICT_MAX_WORD_LEN * 2];
         strcpy(final_string, string1);
+        char space[2] = " ";
+        strcat(final_string, space);
         strcat(final_string, string2);
         
         printf("%10d %s\n", sorted_array[i]->occurrences, final_string);
