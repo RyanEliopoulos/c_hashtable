@@ -1,25 +1,33 @@
 #include"parseFiles.h"
 
 
-/* Returns a hash table with all word pairs */
+/* Returns a hash table with all word pairs filed       */
+/* This function controls reading words from the files  */
+/* and sending them to be processed into the hash table */
+/* 2XX errors are thrown if there aren't at least two   */ 
+/* words across all of the given files                  */
 HashTable *parseFiles(int count, int argc, char *argv[]) {
 
-    int i = (count == -1) ? 1: 2;  // *filepath[] index
-
+    int i = (count == -1) ? 1: 2;  /* argv index of first filepath */
     HashTable *hash_table = newTable(INITIAL_TABLE_SIZE, &entryCompareFunction, &freeData);
+
+    /* variables for word reading */
     char *word1 = NULL;
     char *word2 = NULL;
-    char *temp = "x";
+    char *temp = "x"; /* can't be null for below logic. Arbitrarily chosen as 'x' */
 
     /* Processing files */
-    int j = 0; // Facilitates fix: 'getNextWord' character array leak
+    int j = 0; // Facilitates fix: 'getNextWord' character array leak. 
     for ( i; i < argc; i++ ) {
         FILE* current_file = fopen(argv[i], "r");
         assert(current_file != NULL);        
+
+        /* Terminates when no more words exist in the current file */
         while ((temp = getNextWord(current_file)) != NULL) {
             word1 = word2;
             word2 = temp;
-            j++; // Facilitate fix of 'getNextWord' mem leak
+            j++; // Facilitates fix of 'getNextWord' mem leak
+
             if (word1 != NULL && word2 != NULL) {
                 processPair(hash_table, word1, word2); // Packages words into struct _Data and ships it off to a hash table.
             }
@@ -44,6 +52,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 
     if ( j == 1) {
         fprintf(stderr, "Only one word found (and so no pairs)\n");
+        exit(202);
     }
     return hash_table;
 }
@@ -94,7 +103,8 @@ int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
     return 1; /* Both strings matched. Word pair will be incremented */
 }
 
-/* unallocate memory for a Data object and all its malloc'd structures */
+/* fnx passed to the hash table to facilitate memory management         */
+/* unallocates memory for a Data object and all its malloc'd structures */
 void freeData(Data *data) {
     free(data->string1);
     free(data->string2);
@@ -102,51 +112,27 @@ void freeData(Data *data) {
     free(data);
 }
 
-
-
-
+/* to be used with qsort() to sort the word pairs by count */
 int comparator(const void *e1, const void *e2) {
 
     HashEntry **entry1 = (HashEntry **)e1;
     HashEntry **entry2 = (HashEntry **)e2;
 
-    if ( (*entry1)->occurrences > (*entry2)->occurrences ) {
+    if ((*entry1)->occurrences > (*entry2)->occurrences) {
         return -1;
     }
 
-    if ( (*entry1)->occurrences == (*entry2)->occurrences ) {
+    if ((*entry1)->occurrences == (*entry2)->occurrences) {
         return 0;
     }
     return 1;
-    
-    /*
-    HashEntry *dev = (struct _HashEntry *)entry1;
-    //printf("%llu\n", dev->occurrences);
-
-    if ( ((struct _HashEntry *)entry1)->occurrences > ((struct _HashEntry *)entry2)->occurrences ) {
-        //printf("greater\n");
-        return 1;
-    } 
-
-
-    if ( ((struct _HashEntry *)entry1)->occurrences == ((struct _HashEntry *)entry2)->occurrences ) {
-        printf("equal\n");
-        //printf("<%s>, <%s>\n", (struct _HashEntry *)entry1->data->hash_field, (struct _HashEntry *)entry1->data->hash_field);
-        return 0;
-    }
-    //printf("less than\n");
-    return -1;
-    */
 }
 
+/* a wrapper for qsort() */
 HashEntry **sortPairs(HashTable *hash_table) {
+
     HashEntry **unpacked_array = unpackTableEntries(hash_table);
-    //int (*cmp)(const void *, const void *) = comparator;
-    
-    /* Could be that using the unsigned long long for unique is breaking this. Would need to iteratively sort */
-    qsort( (void *)unpacked_array, hash_table->unique_entries, sizeof(HashTable *), comparator);
+    qsort((void *)unpacked_array, hash_table->unique_entries, sizeof(HashTable *), comparator);
 
     return unpacked_array; /* sorted */
 }
-
-
