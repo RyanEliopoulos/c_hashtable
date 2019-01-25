@@ -1,5 +1,3 @@
-/* Trying to get the hash_field into _Data.  */
-
 #include"parseFiles.h"
 
 
@@ -51,7 +49,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
 }
 
 
-/* Packages the words into a new Data struct and inserts into the hash table via PLACEHOLDER() */
+/* Packages the words into a new Data struct and inserts into the hash table via tableInsert() */
 void processPair(HashTable *hash_table, char *word1, char *word2) {
 
     /* creating top-level structure */
@@ -59,46 +57,41 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
     assert(new_data != NULL);
 
     /* creating structure elements */
-    new_data->string1 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
+    new_data->string1 = malloc(DICT_MAX_WORD_LEN * sizeof(char));
     assert(new_data->string1 != NULL);
-    new_data->string2 = malloc( DICT_MAX_WORD_LEN * sizeof(char) );
+    new_data->string2 = malloc(DICT_MAX_WORD_LEN * sizeof(char));
     assert(new_data->string2 != NULL);
 
-
-    //printf("copying word pair into the structure\n");
     /* load words into the structure */
     strcpy(new_data->string1, word1);
     strcpy(new_data->string2, word2);
    
-     
-    /* build string used for hashing */
-    new_data->hash_field = malloc( (DICT_MAX_WORD_LEN * 2) * sizeof(char)); 
+    /* combine the strings for hashing */
+    new_data->hash_field = malloc((DICT_MAX_WORD_LEN * 2) * sizeof(char)); 
     strcpy(new_data->hash_field, word1);
     strcat(new_data->hash_field, word2);
     
-    //printf("Adding <%s> to the hash table\n", new_data->hash_field);
-    // DEBUGGING so turning the hash table off
-
-    /* free's and allocs match until we start inserting into the table */
-    //freeData(new_data);
-    tableInsert(hash_table, new_data);  // Testing now
-
-    // DEBUGGING STUFF HERE
-    //debug_array[debug_counter++] = new_data;
-   // printf("highest collisions:%u\n", hash_table->highest_collision_count);
+    /* send it of for processing by the hash table */
+    tableInsert(hash_table, new_data);  
 }
 
+/* This function is passed to the hash table upon creation so it can                */
+/* increment word pairs already in the table instead of inserting duplicate pairs   */
+/*                                                                                  */ 
+/* returns 1 if the string values are commensurate                                  */
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
-        
+       
+    /* checking string1 */ 
     char *en1str1 = entry1->data->string1;
     char *en2str1 = entry2->data->string1;
     if (strcmp(en1str1, en2str1)) return 0;
 
+    /* checking string2 */
     char *en1str2 = entry1->data->string2;
     char *en2str2 = entry2->data->string2;
     if (strcmp(en1str2, en2str2)) return 0;
 
-    return 1;
+    return 1; /* Both strings matched. Word pair will be incremented */
 }
 
 /* unallocate memory for a Data object and all its malloc'd structures */
