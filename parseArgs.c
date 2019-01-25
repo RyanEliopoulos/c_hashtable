@@ -16,11 +16,11 @@ int parseArgs(int argc, char *argv[]) {
     /* Checking for user-supplied <count> value. */ 
     int count = -1; // If -1 persists, no user-specified <count> value
 
-    if (argv[1][0] == '-') { 
+    if (argv[1][0] == '-') {  /* user-supplied <count> value */
         char dash; // Only used to satisfy sscanf 
         sscanf(argv[1], "%c %d", &dash, &count);
-
-        if (count <= 0) { 
+        
+        if (count <= 0) {  /* <count> is not an integer or is an invalid value */
             fprintf(stderr, "Invalid input. Must be formatted: <-count> filepath1 <filepath2> <filepath3> .. where count is > 0\n");
             exit(101);
         }
@@ -36,16 +36,15 @@ int parseArgs(int argc, char *argv[]) {
     struct stat statbuf; // Holds file information
 
     int stat_ret;  // Will help evaluate stat() call
-    for ( i ; i < argc ; i++ ) {
+    for (i; i < argc; i++) {
         stat_ret = stat(argv[i], &statbuf); // 0 upon success 
 
         if (stat_ret || !S_ISREG(statbuf.st_mode)) {
-            fprintf(stderr, "\"%s\" is not a valid file path\nBe sure to prefix the coutn with a dash\n", argv[i]);
+            fprintf(stderr, "\"%s\" is not a valid file path\nBe sure to prefix the count with a dash\n", argv[i]);
             exit(103);
         }
     }
     /* All filepaths have now been verified */
-
     printf("All filepaths resolved\n"); 
     return count;
 }
