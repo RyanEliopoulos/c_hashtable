@@ -31,12 +31,12 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
                 word1 = NULL;
             }
         }
-        /* continuation of getNextWord fix */
-        if ( word2 != NULL) {
-            free(word2);
-            word2 = NULL;
-        }
         fclose(current_file); 
+    }
+    /* continuation of getNextWord fix */
+    if ( word2 != NULL) {
+        free(word2);
+        word2 = NULL;
     }
 
     if ( j == 0 ) {
