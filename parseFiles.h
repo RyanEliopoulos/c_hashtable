@@ -29,4 +29,4 @@ void freeData(Data *);
 HashEntry **sortPairs(HashTable *);
 
 /* to be used with qsort() to sort the word pairs by count */
-int comparator(HashEntry *, HashEntry *);
+int comparator(const void *, const void *); 

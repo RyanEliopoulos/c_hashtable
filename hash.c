@@ -22,7 +22,7 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
     /* Initializing table */
     new_table->table_size = table_size;
     new_table->table_directory = malloc(sizeof(HashEntry *) * table_size);
-    assert(new_tabe->table_directory != NULL);
+    assert(new_table->table_directory != NULL);
 
     for (int i = 0; i < table_size; i++) {
         new_table->table_directory[i] = NULL;
