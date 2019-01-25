@@ -16,7 +16,7 @@ typedef struct _Data {
 typedef struct _HashEntry {
     struct _Data *data; // User-defined data structure for use in the hash table. Must have field: char* hash_field
     struct _HashEntry *next_node; 
-    unsigned long long int occurrences; // incremented if identical value is added to the hash table
+    int occurrences; // incremented if identical value is added to the hash table
 } HashEntry;
 
 
