@@ -11,7 +11,7 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
     HashTable *hash_table = newTable(INITIAL_TABLE_SIZE, &entryCompareFunction, &freeData);
     char *word1 = NULL;
     char *word2 = NULL;
-    char *temp = "x"; /* Can't be NULL for later logic, so it is arbitrarily 'x' */
+    char *temp = "x";
 
     /* Processing files */
     int j = 0; // Facilitates fix: 'getNextWord' character array leak
@@ -31,13 +31,12 @@ HashTable *parseFiles(int count, int argc, char *argv[]) {
                 word1 = NULL;
             }
         }
+        /* continuation of getNextWord fix */
+        if ( word2 != NULL) {
+            free(word2);
+            word2 = NULL;
+        }
         fclose(current_file); 
-    }
-    /* continuation of getNextWord fix */
-    /* Positioned here to allow seemless transition between files */
-    if ( word2 != NULL) {
-        free(word2);
-        word2 = NULL;
     }
 
     if ( j == 0 ) {
@@ -112,7 +111,7 @@ void freeData(Data *data) {
 
 
 
-/* Function used by qsort() to sort the elements of the hash table */
+
 int comparator(const void *e1, const void *e2) {
 
     HashEntry **entry1 = (HashEntry **)e1;
@@ -126,6 +125,25 @@ int comparator(const void *e1, const void *e2) {
         return 0;
     }
     return 1;
+    
+    /*
+    HashEntry *dev = (struct _HashEntry *)entry1;
+    //printf("%llu\n", dev->occurrences);
+
+    if ( ((struct _HashEntry *)entry1)->occurrences > ((struct _HashEntry *)entry2)->occurrences ) {
+        //printf("greater\n");
+        return 1;
+    } 
+
+
+    if ( ((struct _HashEntry *)entry1)->occurrences == ((struct _HashEntry *)entry2)->occurrences ) {
+        printf("equal\n");
+        //printf("<%s>, <%s>\n", (struct _HashEntry *)entry1->data->hash_field, (struct _HashEntry *)entry1->data->hash_field);
+        return 0;
+    }
+    //printf("less than\n");
+    return -1;
+    */
 }
 
 HashEntry **sortPairs(HashTable *hash_table) {
