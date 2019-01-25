@@ -17,7 +17,7 @@ void main(int argc, char* argv[]) {
     HashEntry **sorted_entries = sortPairs(hash_table);
 
     /* No user-specified count value, so default to printing all pairs */
-    if (count == -1) count = hash_table->unique_entries;
+    if (count == -1 || count > hash_table->unique_entries) count = hash_table->unique_entries;
 
     printWords(count, sorted_entries);
     /* Printing out "sorted" word pairs */
@@ -74,7 +74,7 @@ void main(int argc, char* argv[]) {
 
 void printWords(int count, HashEntry **sorted_array) {
 
-    printf("<%s> <%s> %d\n", sorted_array[0]->data->string1, sorted_array[0]->data->string2, sorted_array[0]->occurrences);
+    //printf("<%s> <%s> %d\n", sorted_array[0]->data->string1, sorted_array[0]->data->string2, sorted_array[0]->occurrences);
     for (int i = 0; i < count; i++) {
             
         /* retrieve the entry's string values */ 
