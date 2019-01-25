@@ -112,6 +112,15 @@ void freeData(Data *data) {
     free(data);
 }
 
+/* a wrapper for qsort() */
+HashEntry **sortPairs(HashTable *hash_table) {
+
+    HashEntry **unpacked_array = unpackTableEntries(hash_table);
+    qsort((void *)unpacked_array, hash_table->unique_entries, sizeof(HashTable *), comparator);
+
+    return unpacked_array; /* sorted */
+}
+
 /* to be used with qsort() to sort the word pairs by count */
 int comparator(const void *e1, const void *e2) {
 
@@ -128,11 +137,4 @@ int comparator(const void *e1, const void *e2) {
     return 1;
 }
 
-/* a wrapper for qsort() */
-HashEntry **sortPairs(HashTable *hash_table) {
 
-    HashEntry **unpacked_array = unpackTableEntries(hash_table);
-    qsort((void *)unpacked_array, hash_table->unique_entries, sizeof(HashTable *), comparator);
-
-    return unpacked_array; /* sorted */
-}
