@@ -42,7 +42,7 @@ void resizeTable(HashTable *);
 void tableInsert(HashTable *, Data *);
 HashEntry *createHashEntry(Data*);
 HashEntry **unpackTableEntries(HashTable *);
-void freeTable(HashTable *);
+//void freeTable(HashTable *);
 void freeHashEntry(fnxFreeData, HashEntry *);
-
+void releaseTable(HashTable *);
 void debug_traverseTable(HashTable *);

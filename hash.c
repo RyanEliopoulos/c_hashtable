@@ -6,7 +6,7 @@
 /* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
 HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr, fnxFreeData freeDataFnx){
 
-    HashTable *new_table= malloc(sizeof(HashTable));
+    HashTable *new_table = malloc(sizeof(HashTable));
     assert(new_table != NULL);
     
     /* Initialize table values */
@@ -97,9 +97,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     }
 }
 
-/* Not implemeted yet */
 /* resize criteria: maximum per-bucket collision reached */
-/* Testing */
 void resizeTable(HashTable *hash_table) {
     printf("resizing table\n");
     /* retrieve entries for re-hashing */ 
@@ -199,6 +197,23 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
     freeData(hash_entry->data);
     free(hash_entry);
+}
+
+
+void releaseTable(HashTable *hash_table) {
+
+    HashEntry **unpacked_table = unpackTableEntries(hash_table);
+    /* HashEntry and sub-structures */
+    for (int i = 0; i < hash_table->unique_entries; i++) {
+        freeHashEntry(hash_table->freeDataFnx, unpacked_table[i]);
+    }
+
+    /* remaining table structures */
+    free(hash_table->table_directory);
+    free(hash_table);
+
+    /* release locally used  memory */
+    free(unpacked_table);
 }
 
 // This has confirmed all word pairs are put into the table.
