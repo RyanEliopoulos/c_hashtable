@@ -1,4 +1,3 @@
-/* Remember to assert after every malloc */
 /* Probably should go through the code and change ints to unsigned long, etc. in certain places. Don't want overflow */
 
 #include"parseArgs.h"
@@ -16,7 +15,7 @@ void main(int argc, char* argv[]) {
     HashTable *hash_table = parseFiles(count, argc, argv);
     HashEntry **sorted_entries = sortPairs(hash_table);
 
-    /* No user-specified count value, so default to printing all pairs */
+    /* if count is unspecified or exceeds entry count, make adjustment */
     if (count == -1 || count > hash_table->unique_entries) count = hash_table->unique_entries;
 
     printWords(count, sorted_entries);

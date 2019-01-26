@@ -2,14 +2,22 @@
 #include<assert.h>
 #include"crc64.h"
 
+
+/* the initial number of buckets available to the hash table */
 #define INITIAL_TABLE_SIZE 277 // The 50th prime number
+
+/* Threshold of table growth. Once any one bucket reaches 50 collisions the table resizes.  */
+/* However, the collision limit may temporarily exceed 50 while a table is growing.         */
 #define COLLISION_LIMIT 50 // No more than 50 nodes to a linked-list 
+
+/* once the collision limit is reached the table will grow in size by this factor           */
 #define GROWTH_FACTOR 3
 
 
-/* the user must organize their data within a Data object with a hash_field attribute.  */
-/* hash_field is the value used to generate the hash                                    */
-/****************************************************************************************/
+/* the user must organize their data within a Data object with a hash_field attribute in order.  */
+/* to be processed by the hash table.                                                            */
+/* hash_field is the value used to generate the hash                                             */
+/*************************************************************************************************/
 typedef struct _Data {
     char *string1;
     char *string2;
@@ -27,20 +35,21 @@ typedef struct _HashEntry {
 
 
 typedef struct _HashTable {
-    unsigned long long int total_entries; // May not need this
-    unsigned long long int unique_entries; // May not need this
+    unsigned long long int total_entries; 
+    unsigned long long int unique_entries; /* HashEntry objects in the table. required for table operations */
 
     unsigned long int total_collisions;
-    unsigned int highest_collision_count; // Collision count of bucket with most collisions 
-    unsigned long long int table_size; // Tracks the table size. Used in the mod part of the hash process
+    unsigned int highest_collision_count; /* Collision count of bucket with most collisions  */
+
+    unsigned long long int table_size; /*  Number of buckets */
     int (*entryCompareFnx)(HashEntry *, HashEntry *); // Function used to compare the values of the hash table
-    void (*freeDataFnx)(Data *); /* responsible for free-ing all a Data object and all of its data structures. */
-    HashEntry **table_directory; 
+    void (*freeDataFnx)(Data *); /* responsible for freeing a Data object and all of its data structures. */
+    HashEntry **table_directory; /* The array of buckets */
 } HashTable;
 
 
 /* a required user-supplied function to facilitate memory management.   */
-/* Logic should free the Data object and substructures                  */
+/* Logic should free the Data object and all substructures              */
 /************************************************************************/
 typedef void (*fnxFreeData)(Data *);
 
@@ -68,9 +77,11 @@ void addEntry(HashTable *, HashEntry *);
 /************************************************************************************/
 void resizeTable(HashTable *);
 
-/* Helper function for addEntry. Creates a HashEntry object out of a Data object */
-/*********************************************************************************/
-Hoid tableInsert(HashTable *, Data *);
+
+/* Entry point into the hash table code. Packages the user-defined Data object into */ 
+/* a table element and submits it to the hash table                                 */
+/************************************************************************************/
+void tableInsert(HashTable *, Data *);
 
 
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
