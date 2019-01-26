@@ -1,9 +1,9 @@
-
 #include<stdio.h>
 #include"hash.h"
 
-/* Initializes a new hash table. Requires pointer to a function that will be used to compare Data objects. */
-/* Internally the table will increment a relevant counter if an identical Data object is inserted into the table */
+/* Initializes a new hash table. Requires two function pointers: One function for deciding parity between Data object */
+/* values, obviating the need for duplicate data, and another for freeing a Data object and all of its substructures. */
+/**********************************************************************************************************************/
 HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr, fnxFreeData freeDataFnx){
 
     HashTable *new_table = malloc(sizeof(HashTable));
@@ -31,9 +31,9 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 }
 
 
-/* Insertion logic for the hash table */
-/* distinct from tableInsert() so a table can re-hash */
-/* already existing HashEntry objects upon re-size */
+/* Insertion logic for the hash table. Does the actual hashing and comparisons                        */
+/* distinct from tableInsert() so a table can re-hash already existing HashEntry objects upon re-size */
+/******************************************************************************************************/
 void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 
     unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; // Calculating hash value
@@ -97,7 +97,9 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     }
 }
 
-/* resize criteria: maximum per-bucket collision reached */
+/* resize criteria: maximum per-bucket collision reached by any one bucket          */
+/* recursively calls itself if the resized table still violates the collision limit */
+/************************************************************************************/
 void resizeTable(HashTable *hash_table) {
     printf("resizing table\n");
     /* retrieve entries for re-hashing */ 
@@ -138,8 +140,9 @@ void resizeTable(HashTable *hash_table) {
     } 
 }
 
-/* Entry point into the hash table code */
-/* packages the user-defined Data * into a table element */
+/* Entry point into the hash table code. This should be                                         */
+/* packages the user-defined Data object into a table element and submits it to the hash table  */
+/************************************************************************************************/
 void tableInsert(HashTable *hash_table, Data *data_entry) {
     HashEntry *new_entry = createHashEntry(data_entry);
     addEntry(hash_table, new_entry);
@@ -149,6 +152,7 @@ void tableInsert(HashTable *hash_table, Data *data_entry) {
 }
 
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
+/*********************************************************************************/
 HashEntry *createHashEntry(Data *data_entry) {    
 
     /* Create new HashEntry */ 
@@ -163,9 +167,9 @@ HashEntry *createHashEntry(Data *data_entry) {
     return new_entry;
 }
 
-/* Puts all hash entries into a HashEntry array */
-/* Useful for re-hashing a table and qsort() */
-/* Looks like this works now!! */
+/* creates a 1D array by iterating over the table buckets and their chains  */
+/* Useful for re-hashing a table and qsort()                                */
+/****************************************************************************/
 HashEntry **unpackTableEntries(HashTable *hash_table) {
 
     /* Prepare destination of 'flattened' hash table */
@@ -194,12 +198,22 @@ HashEntry **unpackTableEntries(HashTable *hash_table) {
 }
 
 /* unallocates a HashEntry object and all of its children data structures */
+/* For this program that is:                                              */
+/*                          HashEntry->Data object                        */
+/*                          Data object->string1                          */
+/*                          Data object->string2                          */
+/*                          Data object->hash_field                       */
+/**************************************************************************/
 void freeHashEntry(fnxFreeData freeData, HashEntry *hash_entry) {
     freeData(hash_entry->data);
     free(hash_entry);
 }
 
 
+/* frees the hash table and all substructures from memory       */
+/* this relies on the user-supplied free function to properly   */
+/* free all Data substructures                                  */
+/****************************************************************/
 void releaseTable(HashTable *hash_table) {
 
     HashEntry **unpacked_table = unpackTableEntries(hash_table);

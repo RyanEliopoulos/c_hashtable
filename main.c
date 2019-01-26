@@ -20,6 +20,9 @@ void main(int argc, char* argv[]) {
     if (count == -1 || count > hash_table->unique_entries) count = hash_table->unique_entries;
 
     printWords(count, sorted_entries);
+
+    releaseTable(hash_table);
+    free(sorted_entries);
     /* Printing out "sorted" word pairs */
     /*
     char *string1;
@@ -37,10 +40,10 @@ void main(int argc, char* argv[]) {
     // sortPairs(hash_table); // calls unpackTableEntries and qsort()
     // BEGIN: these three lines free all elements of the table and sub-structures.
     /* So, the logc within the unpackTableEntries() is likely causing the segfault */
-    debug_traverseTable(hash_table);
-    free(hash_table->table_directory);
-    free(hash_table);
-    free(sorted_entries);
+    //debug_traverseTable(hash_table);
+    //free(hash_table->table_directory);
+    //free(hash_table);
+    //free(sorted_entries);
     // END
     
     // DEBUG - should be getting a hash table with complete set of values.
