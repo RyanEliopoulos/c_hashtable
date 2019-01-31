@@ -1,5 +1,8 @@
 /* Probably should go through the code and change ints to unsigned long, etc. in certain places. Don't want overflow */
 
+
+/* anticipate reading in too much information that oveflows values in the hash table? */
+
 #include"parseArgs.h"
 #include"parseFiles.h"
 #include<stdlib.h>
@@ -10,7 +13,7 @@ void printWords(int, HashEntry **);
 void main(int argc, char* argv[]) {
     
     int count = parseArgs(argc, argv);
-    printf("Count is :%d\n", count);
+    //printf("Count is :%d\n", count);
 
     HashTable *hash_table = parseFiles(count, argc, argv);
     HashEntry **sorted_entries = sortPairs(hash_table);

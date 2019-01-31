@@ -48,7 +48,7 @@ int parseArgs(int argc, char *argv[]) {
         }
     }
     /* All filepaths have now been verified */
-    printf("All filepaths resolved\n"); 
+    //printf("All filepaths resolved\n"); 
     return count;
 }
 

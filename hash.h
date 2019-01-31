@@ -4,14 +4,14 @@
 
 
 /* the initial number of buckets available to the hash table */
-#define INITIAL_TABLE_SIZE 277 // The 50th prime number
+#define INITIAL_TABLE_SIZE 1000 
 
 /* Threshold of table growth. Once any one bucket reaches 50 collisions the table resizes.  */
 /* However, the collision limit may temporarily exceed 50 while a table is growing.         */
-#define COLLISION_LIMIT 50 // No more than 50 nodes to a linked-list 
+#define COLLISION_LIMIT 50// No more than 50 nodes to a linked-list 
 
 /* once the collision limit is reached the table will grow in size by this factor           */
-#define GROWTH_FACTOR 3
+#define GROWTH_FACTOR 5
 
 
 /* the user must organize their data within a Data object with a hash_field attribute in order.  */
@@ -68,8 +68,9 @@ HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData);
 
 /* Insertion logic for the hash table. Does the actual hashing and comparisons                        */
 /* distinct from tableInsert() so a table can re-hash already existing HashEntry objects upon re-size */
+/* Passing a non-zero int indicates a call from resize, disabling occurrence incrementing             */
 /******************************************************************************************************/
-void addEntry(HashTable *, HashEntry *);
+void addEntry(int, HashTable *, HashEntry *);
 
 
 /* resize criteria: maximum per-bucket collision reached by any one bucket          */

@@ -33,16 +33,18 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 
 /* Insertion logic for the hash table. Does the actual hashing and comparisons                        */
 /* distinct from tableInsert() so a table can re-hash already existing HashEntry objects upon re-size */
+/* Passing a non-zero int indicates a call from resize, disabling occurrence incrementing             */
 /******************************************************************************************************/
-void addEntry(HashTable *hash_table, HashEntry *new_entry) {
+void addEntry(int reHash, HashTable *hash_table, HashEntry *new_entry) {
 
     unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; // Calculating hash value
    
     /* Placing the new_entry into the bucket */ 
 
     if (hash_table->table_directory[hash] == NULL) { /* Bucket is empty, assign and return */
+
         hash_table->table_directory[hash] = new_entry;
-        new_entry->occurrences++; 
+        if (!reHash) new_entry->occurrences++; 
         hash_table->total_entries++;
         hash_table->unique_entries++;
         return;
@@ -56,7 +58,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 
         /* return if a HashEntry match is found */
         if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {  /* True if entries match. */
-            temp_entry->occurrences++; 
+            if (!reHash) temp_entry->occurrences++; 
 
             /* this word pair already exists in the table. this entry is unnecessary */
             freeHashEntry(hash_table->freeDataFnx, new_entry);
@@ -69,7 +71,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 
     /* Checking the last value in the list */
     if ( (*hash_table->entryCompareFnx)(temp_entry, new_entry) ) {
-        temp_entry->occurrences++;
+        if (!reHash) temp_entry->occurrences++;
 
         /* this word pair already exists in the table. this entry is unnecessary */
         freeHashEntry(hash_table->freeDataFnx, new_entry);
@@ -80,7 +82,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
     /* grow the table if the per-bucket collision limit has been exceeded */
     else {
         temp_entry->next_node = new_entry;                              /* new_entry is unique to the hash table */
-        new_entry->occurrences++;
+        if (!reHash) new_entry->occurrences++;
         hash_table->unique_entries++;                                   /* required for table operations */
         if (bucket_collisions > hash_table->highest_collision_count) {  /* update table stats */
             hash_table->highest_collision_count = bucket_collisions;
@@ -92,7 +94,7 @@ void addEntry(HashTable *hash_table, HashEntry *new_entry) {
 /* recursively calls itself if the resized table still violates the collision limit */
 /************************************************************************************/
 void resizeTable(HashTable *hash_table) {
-    printf("resizing table\n");
+    //printf("resizing table\n");
     /* retrieve entries for re-hashing */ 
     HashEntry **unpacked_table = unpackTableEntries(hash_table);
     unsigned long long int entry_count = hash_table->unique_entries; /* Length of unpacked_table */
@@ -120,7 +122,7 @@ void resizeTable(HashTable *hash_table) {
 
     /* re-hash existing table elements */
     for ( int i = 0; i < entry_count; i++ ) { 
-        addEntry(hash_table, unpacked_table[i]);  
+        addEntry(1, hash_table, unpacked_table[i]);  
     }
 
     /* No longer need the unpacked table */
@@ -136,7 +138,7 @@ void resizeTable(HashTable *hash_table) {
 /************************************************************************************************/
 void tableInsert(HashTable *hash_table, Data *data_entry) {
     HashEntry *new_entry = createHashEntry(data_entry);
-    addEntry(hash_table, new_entry);
+    addEntry(0, hash_table, new_entry);
     if ( hash_table->highest_collision_count > COLLISION_LIMIT ) {
         resizeTable(hash_table); 
     }
