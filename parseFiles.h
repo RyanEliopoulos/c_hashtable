@@ -1,6 +1,7 @@
+#include<stdio.h>
 #include<assert.h>
 #include<string.h>
-#include"./include/getWord.h"
+#include<stdlib.h>
 #include"hash.h"
 
 
