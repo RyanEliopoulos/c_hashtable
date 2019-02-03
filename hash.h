@@ -1,6 +1,7 @@
 #include<stdlib.h>
 #include<assert.h>
-
+#include<stdio.h>
+#include<limits.h>
 
 /* the initial number of buckets available to the hash table */
 #define INITIAL_TABLE_SIZE 1000 

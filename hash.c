@@ -1,4 +1,3 @@
-#include<stdio.h>
 #include"hash.h"
 
 /* Initializes a new hash table. Requires two function pointers: One function for deciding parity between Data object */
@@ -37,10 +36,15 @@ HashTable *newTable(unsigned long long int table_size, entryCompareFnx entryCmpr
 /******************************************************************************************************/
 void addEntry(int reHash, HashTable *hash_table, HashEntry *new_entry) {
 
-    unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; // Calculating hash value
+    /* check for possible overflow */
+    if (hash_table->unique_entries == ULLONG_MAX) { 
+        fprintf(stderr, "entry count exceeds maximum value for ullong\n");
+        exit(999);
+    }
+
+    unsigned long long int hash = crc64(new_entry->data->hash_field) % hash_table->table_size; 
    
     /* Placing the new_entry into the bucket */ 
-
     if (hash_table->table_directory[hash] == NULL) { /* Bucket is empty, assign and return */
 
         hash_table->table_directory[hash] = new_entry;
