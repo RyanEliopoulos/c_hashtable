@@ -1,6 +1,5 @@
 #include<stdlib.h>
 #include<assert.h>
-#include"crc64.h"
 
 
 /* the initial number of buckets available to the hash table */
