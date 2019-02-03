@@ -1,14 +1,17 @@
-main: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o 
-	gcc -I${GET_WORD} -o main main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${GET_WORD}/lib/libget.a
+crc_dir = ./hw1/dict
+get_word = ./hw1/getWord
+
+main: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
+	gcc -o main main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
 main.o: main.c
-	gcc -I${GET_WORD} -c main.c
-hash.o: hash.c hash.h
-	gcc -c hash.c
+	gcc -include ${get_word}/include/getWord.h -c main.c
+hash.o: hash.c 
+	gcc -include ${crc_dir}/crc64.h -c hash.c
 parseArgs.o: parseArgs.c parseArgs.h
 	gcc -c parseArgs.c
-parseFiles.o: parseFiles.c parseFiles.h
-	gcc -I${GET_WORD} -c parseFiles.c
-crc64.o: crc64.c crc64.h
-	gcc -c crc64.c
-getWord.o: ${GET_WORD}/include/getWord.c ${GET_WORD}/include/getWord.h
-	gcc -c ${GET_WORD}/include/getWord.c
+parseFiles.o: parseFiles.c parseFiles.h 
+	gcc -include ${get_word}/include/getWord.h -include ${crc_dir}/crc64.h -c parseFiles.c
+crc64.o: ${crc_dir}/crc64.c 
+	gcc -include ${crc_dir}/crc64.h -c ${crc_dir}/crc64.c
+getWord.o: ${get_word}/include/getWord.c 
+	gcc -include ${get_word}/include/getWord.h -c ${get_word}/include/getWord.c
