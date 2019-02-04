@@ -88,7 +88,7 @@ void processPair(HashTable *hash_table, char *word1, char *word2) {
 /* This function is passed to the hash table upon creation so it can                */
 /* increment word pairs already in the table instead of inserting duplicate pairs   */
 /*                                                                                  */ 
-/* returns 1 if the string values are commensurate, else 0                          */
+/* returns 1 if the string values are commensurate                                  */
 int entryCompareFunction(HashEntry *entry1, HashEntry *entry2) {
        
     /* checking string1 */ 
