@@ -1,8 +1,8 @@
 crc_dir = ./hw1/dict
 get_word = ./hw1/getWord
 
-main: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
-	gcc -o main main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
+wordpair: main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
+	gcc -o wordpair main.o hash.o parseArgs.o parseFiles.o crc64.o getWord.o ${get_word}/lib/libget.a
 main.o: main.c
 	gcc -include ${get_word}/include/getWord.h -c main.c
 hash.o: hash.c 
