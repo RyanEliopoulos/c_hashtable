@@ -14,9 +14,11 @@
 #define GROWTH_FACTOR 5
 
 
+//*****      REQUIRED USER-SPECIFIED STRUCTURE     *****/
+
 /* the user must organize their data within a Data object with a hash_field attribute in order.  */
-/* to be processed by the hash table.                                                            */
-/* hash_field is the value used to generate the hash                                             */
+/* to be processed by the hash table. Each Data object represents an entry within the table      */ 
+/* and is held within a HashEntry object                                                         */
 /*************************************************************************************************/
 typedef struct _Data {
     char *string1;
@@ -25,6 +27,7 @@ typedef struct _Data {
 } Data;
 
 
+/* ---- internal structure                             */
 /* A container object used internally by the HashTable */
 /*******************************************************/
 typedef struct _HashEntry {
@@ -34,6 +37,8 @@ typedef struct _HashEntry {
 } HashEntry;
 
 
+
+/* ---- internal structure          */
 typedef struct _HashTable {
     unsigned long long int total_entries; 
     unsigned long long int unique_entries; /* HashEntry objects in the table. required for table operations */
@@ -48,6 +53,22 @@ typedef struct _HashTable {
 } HashTable;
 
 
+
+/*****           REQUIRED USER-SPECIFIED FUNCTIONS             *****/
+/*****                                                         *****/
+/*****                                                         *****/
+
+/* The hash table requires the user to provide two functions  */
+/* 1). fnxFreeData is used upon program conclusion to release */
+/*  all Data objects. The function provides the logic         */
+/*  for releasing all sub-structures of struct _Data          */
+/*                                                            */
+/* 2). entryCompareFnx provides the logic to compare          */
+/*  Data objects and determine if they are represent the same */
+/*  information. This allows the table to track multiple      */
+/*  occurrences of the same information into the table        */
+
+
 /* a required user-supplied function to facilitate memory management.   */
 /* Logic should free the Data object and all substructures              */
 /************************************************************************/
@@ -60,10 +81,44 @@ typedef void (*fnxFreeData)(Data *);
 typedef int (*entryCompareFnx)(HashEntry *, HashEntry *);
 
 
+
+
+/*****    INTERFACE FUNCTIONS   *****/
+/************************************/
+
+
+/* ---- Interface function                                                                                            */
 /* Initializes a new hash table. Requires two function pointers: One function for deciding parity between Data object */
 /* values, obviating the need for duplicate data, and another for freeing a Data object and all of its substructures. */
 /**********************************************************************************************************************/
 HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData); 
+
+
+/* ---- Interface function                                                          */
+/* Entry point into the hash table code. Packages the user-defined Data object into */ 
+/* a table element and submits it to the hash table                                 */
+/************************************************************************************/
+void tableInsert(HashTable *, Data *);
+
+
+/* ---- Interface function                                                  */
+/* creates a 1D array by iterating over the table buckets and their chains  */
+/* Useful for re-hashing a table and qsort()                                */
+/****************************************************************************/
+HashEntry **unpackTableEntries(HashTable *);
+
+
+/* ---- Interface function                                      */
+/* frees the hash table and all substructures from memory       */
+/* this relies on the user-supplied free function to properly   */
+/* free all Data substructures                                  */
+/****************************************************************/
+void releaseTable(HashTable *);
+
+
+
+
+/*****  INTERNAL FUNCTIONS  ****/
 
 
 /* Insertion logic for the hash table. Does the actual hashing and comparisons                        */
@@ -72,43 +127,15 @@ HashTable *newTable(unsigned long long int , entryCompareFnx, fnxFreeData);
 /******************************************************************************************************/
 void addEntry(int, HashTable *, HashEntry *);
 
-
 /* resize criteria: maximum per-bucket collision reached by any one bucket          */
 /* recursively calls itself if the resized table still violates the collision limit */
 /************************************************************************************/
 void resizeTable(HashTable *);
 
-
-/* Entry point into the hash table code. Packages the user-defined Data object into */ 
-/* a table element and submits it to the hash table                                 */
-/************************************************************************************/
-void tableInsert(HashTable *, Data *);
-
-
 /* Helper function for addEntry. Creates a HashEntry object out of a Data object */
 /*********************************************************************************/
 HashEntry *createHashEntry(Data*);
 
-
-/* creates a 1D array by iterating over the table buckets and their chains  */
-/* Useful for re-hashing a table and qsort()                                */
-/****************************************************************************/
-HashEntry **unpackTableEntries(HashTable *);
-
-
 /* unallocates a HashEntry object and all of its children data structures */
-/* For this program that is:                                              */
-/*                          HashEntry->Data object                        */
-/*                          Data object->string1                          */
-/*                          Data object->string2                          */
-/*                          Data object->hash_field                       */
 /**************************************************************************/
 void freeHashEntry(fnxFreeData, HashEntry *);
-
-
-/* frees the hash table and all substructures from memory       */
-/* this relies on the user-supplied free function to properly   */
-/* free all Data substructures                                  */
-/****************************************************************/
-void releaseTable(HashTable *);
-void debug_traverseTable(HashTable *);
