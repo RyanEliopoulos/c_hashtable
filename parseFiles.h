@@ -19,11 +19,18 @@ void processPair(HashTable *, char *, char *);
 /* This function is passed to the hash table upon creation so it can                */
 /* increment word pairs already in the table instead of inserting duplicate pairs   */
 /*                                                                                  */ 
-/* returns 1 if the string values are commensurate                                  */
+/* returns 1 if the string values are commensurate, else 0                          */
 int entryCompareFunction(HashEntry *, HashEntry *);
 
-/* fnx passed to the hash table to facilitate memory management         */
-/* unallocates memory for a Data object and all its malloc'd structures */
+
+
+/* fnx passed to the hash table to facilitate memory management           */
+/* unallocates memory for a Data object and all its malloc'd structures   */
+/* for this program:                                                      */
+/*                          Data object->string1                          */
+/*                          Data object->string2                          */
+/*                          Data object->hash_field                       */
+/**************************************************************************/
 void freeData(Data *);
 
 /* a wrapper for qsort() */
