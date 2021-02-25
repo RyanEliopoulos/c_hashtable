@@ -1,5 +1,3 @@
-Ryan Paulos<br>
-
 ### Program
 This program is an exercise in building a solid hash table to improve lookup performance.  
 <br>
