@@ -1,5 +1,5 @@
 Ryan Paulos
-CS360, Assignment 1
+CS360
 
 
 Program:
