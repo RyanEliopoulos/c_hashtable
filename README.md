@@ -19,7 +19,6 @@ The user must also create two functions, required as arguments when calling the 
 <br>
 - 1). The first function provides the logic for comparing two Data objects so the hash table can determine
     when there is a repetition of data.
-<br>
 - 2). The second must provide the logic for freeing all memory tied up in an individual Data object.
 
 The typedef for these two functions exist within the hash.h file as entryCompareFnx and fnxFreeData 
